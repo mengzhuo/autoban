@@ -1,0 +1,7 @@
+2024/01/15 03:20:10 [error] 2345#2345: *9876 user "admin": password mismatch, client: 203.0.113.50, server: _, request: "GET /admin HTTP/1.1", host: "example.com"
+2024/01/15 03:20:12 [error] 2345#2345: *9877 user "test": was not found in "/etc/nginx/htpasswd", client: 198.51.100.60, server: _, request: "GET /private HTTP/1.1", host: "example.com"
+2024/01/15 03:20:14 [error] 2345#2345: *9878 No user found: "guest", client: 203.0.113.51, server: _, request: "GET / HTTP/1.1", host: "example.com"
+2024/01/15 03:20:16 [error] 2345#2345: *9879 open() "/var/www/missing" failed (2: No such file or directory), client: 203.0.113.52, server: _, request: "GET /missing HTTP/1.1", host: "example.com"
+2024/01/15 03:20:18 [error] 2345#2345: *9880 access forbidden by rule, client: 203.0.113.53, server: _, request: "GET /secret HTTP/1.1", host: "example.com"
+2024/01/15 03:20:20 [notice] 2345#2345: signal process started
+2024/01/15 03:20:22 [error] 2345#2345: *9881 user "operator": password mismatch, client: 2001:db8::50, server: _, request: "GET /ops HTTP/1.1", host: "example.com"

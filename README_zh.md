@@ -286,6 +286,7 @@ make test       # 单元 + 端到端测试
 make race       # race detector
 make vet        # go vet
 make demo       # 端到端演示
+go test ./internal/filter -run TestReal -v   # 脱敏真实日志样本
 ```
 
 GitHub Actions 会运行四个独立任务：`fmt`、`lint`、`build`、`test`，配置见 [.github/workflows/ci.yml](.github/workflows/ci.yml)。
@@ -312,7 +313,7 @@ scripts/demo.sh   端到端演示
 .github/          GitHub Actions CI
 ```
 
-测试覆盖配置解析、IPv4/IPv6、日期格式、封禁策略、动作超时、日志轮转、端到端封禁、重启恢复和热重载。
+测试覆盖配置解析、IPv4/IPv6、日期格式、封禁策略、动作超时、日志轮转、端到端封禁、重启恢复和热重载。过滤器测试还包含脱敏的 OpenSSH 与 nginx 真实日志样本，位于 `internal/filter/testdata/`。
 
 ## 文档
 

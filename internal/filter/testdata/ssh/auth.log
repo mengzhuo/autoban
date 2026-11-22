@@ -1,0 +1,18 @@
+Jan 15 03:12:44 web01 sshd[12345]: Failed password for invalid user admin from 203.0.113.42 port 51234 ssh2
+Jan 15 03:12:46 web01 sshd[12345]: Invalid user oracle from 198.51.100.23 port 40122
+Jan 15 03:12:48 web01 sshd[12346]: Failed publickey for root from 203.0.113.99 port 42111 ssh2
+Jan 15 03:12:50 web01 sshd[12347]: Connection closed by authenticating user root 203.0.113.77 port 50022 [preauth]
+Jan 15 03:12:51 web01 sshd[12348]: Disconnecting invalid user test 2001:db8::42 port 40555 [preauth]
+Jan 15 03:12:52 web01 sshd[12348]: Disconnected from authenticating user root 203.0.113.78 port 40556 [preauth]
+Jan 15 03:12:53 web01 sshd[12349]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.55  user=admin
+Jan 15 03:12:54 web01 sshd[12349]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.56  user=admin
+Jan 15 03:12:55 web01 sshd[12350]: error: maximum authentication attempts exceeded for root from 203.0.113.66 port 55555 ssh2 [preauth]
+Jan 15 03:12:56 web01 sshd[12351]: Failed keyboard-interactive/pam for invalid user ftp from 203.0.113.67 port 55556 ssh2
+Jan 15 03:12:57 web01 sshd[12352]: Failed password for root from 127.0.0.1 port 40000 ssh2
+2024-01-15T03:14:00.123456+00:00 web01 sshd[12354]: Failed password for invalid user ftp from 203.0.113.88 port 60022 ssh2
+2024-01-15T03:14:01Z web01 sshd[12355]: Failed password for root from ::ffff:198.51.100.77 port 22 ssh2
+Jan 15 03:14:02 web01 sshd[12356]: Accepted publickey for deploy from 203.0.113.10 port 43000 ssh2
+Jan 15 03:14:03 web01 sshd[12357]: Received disconnect from 203.0.113.10 port 43000:11: Bye Bye [preauth]
+Jan 15 03:14:04 web01 sshd[12358]: Connection closed by 203.0.113.11 port 43001 [preauth]
+Jan 15 03:14:05 web01 sshd[12359]: Disconnected from 203.0.113.12 port 43002 [preauth]
+Jan 15 03:14:06 web01 sshd[12360]: pam_unix(sshd:session): session opened for user deploy(uid=1000) by (uid=0)

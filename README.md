@@ -286,6 +286,7 @@ make test       # unit + end-to-end tests
 make race       # race detector
 make vet        # go vet
 make demo       # end-to-end demo
+go test ./internal/filter -run TestReal -v   # sanitized real-world log fixtures
 ```
 
 GitHub Actions runs four independent jobs: `fmt`, `lint`, `build` and `test`; see [.github/workflows/ci.yml](.github/workflows/ci.yml).
@@ -312,7 +313,7 @@ scripts/demo.sh   end-to-end demo
 .github/          GitHub Actions CI
 ```
 
-Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action timeouts, log rotation, end-to-end banning, restart recovery and hot reload.
+Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action timeouts, log rotation, end-to-end banning, restart recovery and hot reload. The filter suite also includes sanitized real-world OpenSSH and nginx log fixtures under `internal/filter/testdata/`.
 
 ## Documentation
 
