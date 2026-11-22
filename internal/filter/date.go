@@ -2,6 +2,7 @@ package filter
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -114,6 +115,7 @@ func buildDatePart(pattern string) (*datePart, error) {
 		c := pattern[i]
 		if c != '%' {
 			re.WriteString(regexp.QuoteMeta(string(c)))
+			layouts = appendSuffix(layouts, string(c))
 			continue
 		}
 		i++
@@ -175,8 +177,8 @@ func buildDatePart(pattern string) (*datePart, error) {
 			re.WriteString(`\d{1,2}`)
 			addLayouts("05")
 		case 'f':
-			re.WriteString(`(?:[.,]\d{1,9})?`)
-			addLayouts(".999999999")
+			re.WriteString(`\d{1,9}`)
+			addLayouts("999999999")
 		case 'z':
 			re.WriteString(`(?:Z|[+-]\d{2}:?\d{2})`)
 			addLayouts("-0700", "-07:00", "Z07:00")
@@ -257,19 +259,18 @@ func parseLogTime(line string, parser *dateParser, now time.Time) (time.Time, bo
 }
 
 func (p *datePart) parse(text string, now time.Time) (time.Time, bool) {
-	text = strings.TrimSpace(strings.Trim(text, "[]"))
+	text = strings.TrimSpace(text)
 	if p.epoch {
-		n, err := strconv.ParseInt(text, 10, 64)
-		if err == nil {
-			if len(text) >= 13 {
-				n /= 1000
-			}
-			return time.Unix(n, 0), true
+		if t, ok := parseEpochText(strings.Trim(text, "[]")); ok {
+			return t, true
 		}
 	}
 	variants := []string{text}
+	if trimmed := strings.Trim(text, "[]"); trimmed != text {
+		variants = append(variants, trimmed)
+	}
 	normalized := strings.Join(strings.Fields(text), " ")
-	if normalized != text {
+	if normalized != text && normalized != "" {
 		variants = append(variants, normalized)
 	}
 	for _, layout := range p.layouts {
@@ -363,6 +364,13 @@ var builtinDates = []builtinDate{
 		hasDate: true,
 	},
 	{
+		// Caddy and other structured loggers use a JSON "ts" epoch field,
+		// sometimes as a floating point number with sub-second precision.
+		re:      regexp.MustCompile(`^\s*\{[^\n]*?"ts":(\d{10,13}(?:\.\d+)?)`),
+		layouts: nil,
+		epoch:   true,
+	},
+	{
 		re:      regexp.MustCompile(`^\s*(\d{10})(?:\s|$)`),
 		layouts: nil,
 		epoch:   true,
@@ -374,6 +382,53 @@ var builtinDates = []builtinDate{
 	},
 }
 
+func parseEpochText(text string) (time.Time, bool) {
+	text = strings.TrimSpace(text)
+	if text == "" {
+		return time.Time{}, false
+	}
+	if strings.ContainsAny(text, "eE") {
+		f, err := strconv.ParseFloat(text, 64)
+		if err != nil || math.IsNaN(f) || math.IsInf(f, 0) || f < 0 {
+			return time.Time{}, false
+		}
+		sec := int64(f)
+		nsec := int64(math.Round((f - float64(sec)) * 1e9))
+		if nsec >= 1e9 {
+			sec++
+			nsec -= 1e9
+		}
+		return time.Unix(sec, nsec), true
+	}
+	if dot := strings.IndexByte(text, '.'); dot >= 0 {
+		sec, err := strconv.ParseInt(text[:dot], 10, 64)
+		if err != nil {
+			return time.Time{}, false
+		}
+		frac := text[dot+1:]
+		if frac == "" {
+			return time.Unix(sec, 0), true
+		}
+		if len(frac) > 9 {
+			frac = frac[:9]
+		}
+		frac += strings.Repeat("0", 9-len(frac))
+		nsec, err := strconv.ParseInt(frac, 10, 64)
+		if err != nil {
+			return time.Time{}, false
+		}
+		return time.Unix(sec, nsec), true
+	}
+	n, err := strconv.ParseInt(text, 10, 64)
+	if err != nil {
+		return time.Time{}, false
+	}
+	if len(text) >= 13 {
+		n /= 1000
+	}
+	return time.Unix(n, 0), true
+}
+
 func parseBuiltinTime(line string, now time.Time) (time.Time, bool) {
 	for _, b := range builtinDates {
 		loc := b.re.FindStringSubmatchIndex(line)
@@ -382,14 +437,10 @@ func parseBuiltinTime(line string, now time.Time) (time.Time, bool) {
 		}
 		text := strings.TrimSpace(strings.Trim(line[loc[2]:loc[3]], "[]"))
 		if b.epoch {
-			n, err := strconv.ParseInt(text, 10, 64)
-			if err != nil {
-				continue
+			if t, ok := parseEpochText(text); ok {
+				return t, true
 			}
-			if len(text) >= 13 {
-				n /= 1000
-			}
-			return time.Unix(n, 0), true
+			continue
 		}
 		variants := []string{text}
 		if normalized := strings.Join(strings.Fields(text), " "); normalized != text {

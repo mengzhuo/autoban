@@ -158,6 +158,8 @@ failregex = ^.*Failed password for (?:invalid user )?\S+ from <HOST> port \d+(?:
 ignoreregex = ^.*from 192\.0\.2\.10 port .*$
 ```
 
+仓库自带 `sshd`、`nginx-http-auth`、`apache-auth` 和 `caddy-auth` 四个过滤器示例。Apache 使用 error log（2.4 与 2.2 格式），Caddy 使用启用 access log 后的 JSON 日志（`logger=http.log.access` 且 `status=401`）。
+
 ### 4.1 正则 token
 
 | Token | 含义 |
@@ -194,7 +196,7 @@ RE2 支持 `(?i)`、`(?m)`、`(?s)`、非贪婪量词、命名组 `(?P<name>...)
 
 `%Y %y %m %d %e %H %I %M %S %f %z %Z %b %B %a %A %p %j %s %n %t`
 
-以及 `{^LN-BEG}` / `{^L-BEG}` 行首标记。`%Y-%m-%dT%H:%M:%S` 这类简单格式可以精确工作；复杂正则式 datepattern 可能退回内置识别。
+以及 `{^LN-BEG}` / `{^L-BEG}` 行首标记。`%f` 表示小数秒数字，通常写成 `%S.%f`；不带小数秒的格式可以再加一个用 `|` 分隔的分支，例如 `apache-auth` 同时支持带毫秒和不带毫秒的 error log。`%Y-%m-%dT%H:%M:%S` 这类简单格式可以精确工作；复杂正则式 datepattern 可能退回内置识别。
 
 示例：
 

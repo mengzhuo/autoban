@@ -1,0 +1,7 @@
+[Wed Oct 11 14:32:52.123456 2023] [auth_basic:error] [pid 1234:tid 5678] [client 203.0.113.20:54321] AH01617: user admin: authentication failure for "/admin": Password Mismatch
+[Wed Oct 11 14:32:54.654321 2023] [auth_basic:error] [pid 1234:tid 5679] [client 198.51.100.21:54322] AH01618: user test not found: /private
+[Wed Oct 11 14:32:56 2023] [error] [client 203.0.113.22] user admin: authentication failure for "/admin": Password Mismatch
+[Wed Oct 11 14:32:58 2023] [error] [client 198.51.100.23] user guest not found: /private
+[Wed Oct 11 14:33:04.333333 2023] [auth_basic:error] [pid 1234:tid 5682] [client 2001:db8::20:54326] AH01617: user admin: authentication failure for "/admin": Password Mismatch
+[Wed Oct 11 14:33:00.111111 2023] [core:error] [pid 1234:tid 5680] [client 203.0.113.24:54323] AH00135: Invalid method in request "BAD"
+[Wed Oct 11 14:33:02.222222 2023] [mpm_event:notice] [pid 1234:tid 5681] AH00489: Apache/2.4.57 (Unix) configured

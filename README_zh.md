@@ -34,6 +34,7 @@ gojail 持续读取 SSH、nginx、Apache 等日志，用 `failregex` 识别失�
 
 - **fail2ban 风格配置**：`gojail.conf` / `jail.conf` / `.local`，支持 `[DEFAULT]`、`%(option)s` 插值、`[INCLUDES] before/after` 和多行值。
 - **过滤器引擎**：`failregex`、`ignoreregex`、`prefregex`，支持 `<HOST>`、`<ADDR>`、`<SUBNET>`、`<USER>` 等占位符。
+- **内置过滤器**：OpenSSH、nginx HTTP auth、Apache 2.4/2.2 auth、Caddy JSON 401 访问日志。
 - **日志时间识别**：内置 syslog、ISO-8601、nginx、Apache、epoch 格式，支持 `datepattern` 自定义。
 - **完整封禁生命周期**：`maxretry`、`findtime`、`bantime`、永久封禁、`ignoreip`、`ignorecommand`、`bantime.increment`。
 - **动作系统**：`actioncheck/start/stop/ban/unban/flush`，多动作链，占位符替换，执行超时和进程组清理。
@@ -313,7 +314,7 @@ scripts/demo.sh   端到端演示
 .github/          GitHub Actions CI
 ```
 
-测试覆盖配置解析、IPv4/IPv6、日期格式、封禁策略、动作超时、日志轮转、端到端封禁、重启恢复和热重载。过滤器测试还包含脱敏的 OpenSSH 与 nginx 真实日志样本，位于 `internal/filter/testdata/`。
+测试覆盖配置解析、IPv4/IPv6、日期格式、封禁策略、动作超时、日志轮转、端到端封禁、重启恢复和热重载。过滤器测试还包含脱敏的 OpenSSH、nginx、Apache、Caddy 真实日志样本，位于 `internal/filter/testdata/`。
 
 ## 文档
 

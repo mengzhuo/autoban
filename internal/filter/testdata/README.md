@@ -9,6 +9,11 @@ production logs.
   IPv6, IPv4-mapped IPv6, PAM messages and non-failure noise.
 - `nginx/error.log`: nginx HTTP basic-auth failures plus unrelated error and
   notice lines.
+- `apache/error.log`: Apache 2.4 and 2.2 basic-auth error-log formats plus
+  unrelated error/notice lines.
+- `apache/access.log`: default/common Apache access logs, used to verify that
+  the auth filter does not ban plain 401 access-log entries.
+- `caddy/access.log`: Caddy JSON access logs with 401, 200 and 502 responses.
 
 The tests in `internal/filter/real_logs_test.go` load the shipped filters from
 `config/filter.d` and assert the match and per-host counts.

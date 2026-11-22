@@ -122,7 +122,7 @@ func TestLoadSampleConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(specs) != 2 {
+	if len(specs) != 4 {
 		t.Fatalf("got %d jails", len(specs))
 	}
 	var sshd *JailSpec

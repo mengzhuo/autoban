@@ -182,4 +182,75 @@ func TestRealLogTimestampParsing(t *testing.T) {
 	if !m.Time.Equal(wantNginx) {
 		t.Fatalf("nginx time = %v, want %v", m.Time, wantNginx)
 	}
+
+	apache := loadFixtureFilter(t, "apache-auth", nil)
+	apacheLine := `[Wed Oct 11 14:32:52.123456 2023] [auth_basic:error] [pid 1234:tid 5678] [client 203.0.113.20:54321] AH01617: user admin: authentication failure for "/admin": Password Mismatch`
+	m, ok = apache.Match(apacheLine, now)
+	if !ok {
+		t.Fatal("apache line did not match")
+	}
+	wantApache := time.Date(2023, 10, 11, 14, 32, 52, 123456000, time.Local)
+	if !m.Time.Equal(wantApache) {
+		t.Fatalf("apache time = %v, want %v", m.Time, wantApache)
+	}
+
+	apache22 := `[Wed Oct 11 14:32:56 2023] [error] [client 203.0.113.22] user admin: authentication failure for "/admin": Password Mismatch`
+	m, ok = apache.Match(apache22, now)
+	if !ok {
+		t.Fatal("apache 2.2 line did not match")
+	}
+	wantApache22 := time.Date(2023, 10, 11, 14, 32, 56, 0, time.Local)
+	if !m.Time.Equal(wantApache22) {
+		t.Fatalf("apache 2.2 time = %v, want %v", m.Time, wantApache22)
+	}
+
+	caddy := loadFixtureFilter(t, "caddy-auth", nil)
+	caddyLine := `{"level":"info","ts":1705304700.123456,"logger":"http.log.access","msg":"handled request","request":{"remote_ip":"203.0.113.60","remote_port":"54321","proto":"HTTP/1.1","method":"GET","host":"example.com","uri":"/admin","remote_addr":"203.0.113.60:54321"},"bytes_read":0,"user_id":"","duration":0.000123,"size":0,"status":401}`
+	m, ok = caddy.Match(caddyLine, now)
+	if !ok {
+		t.Fatal("caddy line did not match")
+	}
+	wantCaddy := time.Unix(1705304700, 123456000)
+	if !m.Time.Equal(wantCaddy) {
+		t.Fatalf("caddy time = %v (%d), want %v (%d)", m.Time, m.Time.UnixNano(), wantCaddy, wantCaddy.UnixNano())
+	}
+}
+
+func TestRealApacheLogFixture(t *testing.T) {
+	f := loadFixtureFilter(t, "apache-auth", nil)
+	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
+	hosts, total, matched := scanFixture(t, filepath.Join("testdata", "apache", "error.log"), f, now)
+	if total != 7 || matched != 5 {
+		t.Fatalf("total=%d matched=%d, want 7/5", total, matched)
+	}
+	assertHostCounts(t, hosts, map[string]int{
+		"203.0.113.20":  1,
+		"198.51.100.21": 1,
+		"203.0.113.22":  1,
+		"198.51.100.23": 1,
+		"2001:db8::20":  1,
+	})
+}
+
+func TestApacheAccessLogDoesNotMatchAuthFilter(t *testing.T) {
+	f := loadFixtureFilter(t, "apache-auth", nil)
+	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
+	_, total, matched := scanFixture(t, filepath.Join("testdata", "apache", "access.log"), f, now)
+	if total != 3 || matched != 0 {
+		t.Fatalf("access log total=%d matched=%d, want 3/0", total, matched)
+	}
+}
+
+func TestRealCaddyLogFixture(t *testing.T) {
+	f := loadFixtureFilter(t, "caddy-auth", nil)
+	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
+	hosts, total, matched := scanFixture(t, filepath.Join("testdata", "caddy", "access.log"), f, now)
+	if total != 5 || matched != 3 {
+		t.Fatalf("total=%d matched=%d, want 5/3", total, matched)
+	}
+	assertHostCounts(t, hosts, map[string]int{
+		"203.0.113.60":  1,
+		"198.51.100.61": 1,
+		"2001:db8::60":  1,
+	})
 }
