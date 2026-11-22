@@ -1,0 +1,3 @@
+2024-01-15 03:52:00 mail exim[1234]: 2024-01-15 03:52:00 login authenticator failed for (x) [203.0.113.95]: 535 Incorrect authentication data (set_id=admin)
+2024-01-15 03:52:02 mail exim[1234]: 2024-01-15 03:52:02 H=(x) [203.0.113.96] F=<a@example.com> rejected RCPT <spam@example.com>: relay not permitted
+2024-01-15 03:52:04 mail exim[1234]: 2024-01-15 03:52:04 [203.0.113.97] ready

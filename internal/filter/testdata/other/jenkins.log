@@ -1,0 +1,4 @@
+Jan 15, 2024 4:02:00 AM hudson.security.AuthenticationProcessingFilter2 onAuthenticationFailure
+WARNING: Login failure for admin from 203.0.113.150
+Jan 15, 2024 4:02:02 AM hudson.security.AuthenticationProcessingFilter2 onAuthenticationFailure
+WARNING: Login failure for test from 203.0.113.151

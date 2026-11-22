@@ -158,7 +158,7 @@ failregex = ^.*Failed password for (?:invalid user )?\S+ from <HOST> port \d+(?:
 ignoreregex = ^.*from 192\.0\.2\.10 port .*$
 ```
 
-仓库自带 `sshd`、`nginx-http-auth`、`apache-auth` 和 `caddy-auth` 四个过滤器示例。Apache 使用 error log（2.4 与 2.2 格式），Caddy 使用启用 access log 后的 JSON 日志（`logger=http.log.access` 且 `status=401`）。
+仓库自带 34 个过滤器，完整列表见 [filters.md](filters.md)。Apache 使用 error log（2.4 与 2.2 格式），Caddy 使用启用 access log 后的 JSON 日志（`logger=http.log.access` 且 `status=401`）。
 
 ### 4.1 正则 token
 

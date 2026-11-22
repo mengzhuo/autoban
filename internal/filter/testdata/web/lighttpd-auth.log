@@ -1,0 +1,3 @@
+2024-01-15 03:41:00: (http_auth.c.900) password doesn't match for /admin (username "admin"), IP 203.0.113.73
+2024-01-15 03:41:02: (http_auth.c.882) user not found: test, IP 203.0.113.74
+2024-01-15 03:41:04: (connections.c.300) connection closed: 203.0.113.75

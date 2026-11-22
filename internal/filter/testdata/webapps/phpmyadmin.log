@@ -1,0 +1,3 @@
+Jan 15 04:08:00 db phpmyadmin[1234]: user denied: root (mysql-denied) from 203.0.113.202
+Jan 15 04:08:02 db phpmyadmin[1234]: user denied: admin (mysql-denied) from 203.0.113.203
+Jan 15 04:08:04 db phpmyadmin[1234]: user logged in: deploy from 203.0.113.204

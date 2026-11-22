@@ -254,3 +254,110 @@ func TestRealCaddyLogFixture(t *testing.T) {
 		"2001:db8::60":  1,
 	})
 }
+
+func TestMoreRealLogFilters(t *testing.T) {
+	cases := []struct {
+		name    string
+		filter  string
+		fixture string
+		total   int
+		matched int
+		hosts   map[string]int
+	}{
+		{"dropbear", "dropbear", "ssh/dropbear.log", 4, 2, map[string]int{"203.0.113.70": 1, "203.0.113.71": 1}},
+		{"lighttpd", "lighttpd-auth", "web/lighttpd-auth.log", 3, 2, map[string]int{"203.0.113.73": 1, "203.0.113.74": 1}},
+		{"haproxy", "haproxy-http-auth", "web/haproxy-http-auth.log", 3, 2, map[string]int{"203.0.113.75": 1, "2001:db8::76": 1}},
+		{"traefik", "traefik-auth", "web/traefik-auth.log", 3, 2, map[string]int{"203.0.113.77": 1, "2001:db8::78": 1}},
+		{"nextcloud", "nextcloud-auth", "webapps/nextcloud.log", 3, 2, map[string]int{"203.0.113.203": 1, "203.0.113.204": 1}},
+		{"roundcube", "roundcube", "webapps/roundcube.log", 3, 2, map[string]int{"203.0.113.201": 1, "203.0.113.202": 1}},
+		{"phpmyadmin", "phpmyadmin-syslog", "webapps/phpmyadmin.log", 3, 2, map[string]int{"203.0.113.202": 1, "203.0.113.203": 1}},
+		{"webmin", "webmin-auth", "webapps/webmin.log", 3, 2, map[string]int{"203.0.113.200": 1, "203.0.113.201": 1}},
+		{"postfix", "postfix", "mail/postfix.log", 3, 2, map[string]int{"203.0.113.90": 1, "203.0.113.91": 1}},
+		{"dovecot", "dovecot", "mail/dovecot.log", 3, 2, map[string]int{"203.0.113.93": 1, "203.0.113.94": 1}},
+		{"exim", "exim", "mail/exim.log", 3, 2, map[string]int{"203.0.113.95": 1, "203.0.113.96": 1}},
+		{"vsftpd", "vsftpd", "ftp/vsftpd.log", 3, 2, map[string]int{"203.0.113.100": 1, "203.0.113.101": 1}},
+		{"proftpd", "proftpd", "ftp/proftpd.log", 3, 2, map[string]int{"203.0.113.101": 1, "203.0.113.102": 1}},
+		{"pure-ftpd", "pure-ftpd", "ftp/pure-ftpd.log", 3, 2, map[string]int{"203.0.113.102": 1, "203.0.113.103": 1}},
+		{"openvpn", "openvpn", "vpn/openvpn.log", 3, 2, map[string]int{"203.0.113.110": 1, "203.0.113.111": 1}},
+		{"asterisk", "asterisk", "voip/asterisk.log", 3, 2, map[string]int{"203.0.113.120": 1, "203.0.113.121": 1}},
+		{"mysql", "mysql-auth", "db/mysql.log", 3, 2, map[string]int{"203.0.113.130": 1, "203.0.113.131": 1}},
+		{"mongodb", "mongodb-auth", "db/mongodb.log", 3, 2, map[string]int{"203.0.113.131": 1, "203.0.113.132": 1}},
+		{"samba", "samba", "other/samba.log", 3, 2, map[string]int{"203.0.113.140": 1, "203.0.113.141": 1}},
+		{"jenkins", "jenkins-auth", "other/jenkins.log", 4, 2, map[string]int{"203.0.113.150": 1, "203.0.113.151": 1}},
+		{"squid", "squid", "other/squid.log", 3, 2, map[string]int{"203.0.113.170": 1, "203.0.113.171": 1}},
+		{"rsync", "rsync", "other/rsync.log", 3, 2, map[string]int{"203.0.113.180": 1, "203.0.113.181": 1}},
+		{"sendmail", "sendmail-auth", "mail/sendmail.log", 3, 2, map[string]int{"203.0.113.210": 1, "203.0.113.211": 1}},
+		{"courier", "courier-auth", "mail/courier.log", 3, 2, map[string]int{"203.0.113.211": 1, "203.0.113.212": 1}},
+		{"cyrus", "cyrus-imap", "mail/cyrus.log", 3, 2, map[string]int{"203.0.113.212": 1, "203.0.113.213": 1}},
+		{"zimbra", "zimbra-auth", "mail/zimbra.log", 3, 2, map[string]int{"203.0.113.214": 1, "203.0.113.215": 1}},
+		{"mssql", "mssql-auth", "db/mssql.log", 3, 2, map[string]int{"203.0.113.215": 1, "203.0.113.216": 1}},
+		{"directadmin", "directadmin", "webapps/directadmin.log", 3, 2, map[string]int{"203.0.113.218": 1, "203.0.113.219": 1}},
+		{"froxlor", "froxlor-auth", "webapps/froxlor.log", 3, 2, map[string]int{"203.0.113.220": 1, "203.0.113.221": 1}},
+		{"portsentry", "portsentry", "other/portsentry.log", 3, 2, map[string]int{"203.0.113.217": 1, "203.0.113.218": 1}},
+	}
+	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			f := loadFixtureFilter(t, tc.filter, nil)
+			hosts, total, matched := scanFixture(t, filepath.Join("testdata", filepath.FromSlash(tc.fixture)), f, now)
+			if total != tc.total || matched != tc.matched {
+				t.Fatalf("total=%d matched=%d, want %d/%d", total, matched, tc.total, tc.matched)
+			}
+			assertHostCounts(t, hosts, tc.hosts)
+		})
+	}
+}
+
+func TestMoreRealLogTimestamps(t *testing.T) {
+	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
+
+	nextcloud := loadFixtureFilter(t, "nextcloud-auth", nil)
+	m, ok := nextcloud.Match(`{"reqId":"abc","level":2,"time":"2024-01-15T04:09:00+00:00","remoteAddr":"203.0.113.203","message":"Login failed: admin"}`, now)
+	if !ok {
+		t.Fatal("nextcloud line did not match")
+	}
+	wantNextcloud := time.Date(2024, 1, 15, 4, 9, 0, 0, time.UTC)
+	if !m.Time.Equal(wantNextcloud) {
+		t.Fatalf("nextcloud time = %v, want %v", m.Time, wantNextcloud)
+	}
+
+	roundcube := loadFixtureFilter(t, "roundcube", nil)
+	m, ok = roundcube.Match(`[15-Jan-2024 04:07:00 +0000]: <abc123> Failed login for admin from 203.0.113.201 in /var/www/roundcube/index.php on line 1`, now)
+	if !ok {
+		t.Fatal("roundcube line did not match")
+	}
+	wantRoundcube := time.Date(2024, 1, 15, 4, 7, 0, 0, time.FixedZone("", 0))
+	if !m.Time.Equal(wantRoundcube) {
+		t.Fatalf("roundcube time = %v, want %v", m.Time, wantRoundcube)
+	}
+}
+
+func TestAllBundledFiltersCompile(t *testing.T) {
+	files, err := filepath.Glob(filepath.Join("..", "..", "config", "filter.d", "*.conf"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(files) == 0 {
+		t.Fatal("no bundled filters found")
+	}
+	for _, path := range files {
+		name := strings.TrimSuffix(filepath.Base(path), ".conf")
+		t.Run(name, func(t *testing.T) {
+			fs, err := config.LoadFilter(name, []string{filepath.Join("..", "..", "config")}, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := filter.Compile(filter.Options{
+				Name:        name,
+				FailRegex:   fs.FailRegex,
+				IgnoreRegex: fs.IgnoreRegex,
+				PreRegex:    fs.PreRegex,
+				DatePattern: fs.DatePattern,
+				MaxLines:    fs.MaxLines,
+				UsedNS:      "no",
+			}); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}

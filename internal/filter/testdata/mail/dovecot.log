@@ -1,0 +1,3 @@
+Jan 15 03:51:00 mail dovecot: auth: pam_unix(dovecot:auth): authentication failure; logname= uid=0 euid=0 tty=dovecot ruser=admin rhost=203.0.113.93
+Jan 15 03:51:02 mail dovecot: imap-login: Disconnected (auth failed, 1 attempts in 2 secs): user=<admin>, method=PLAIN, rip=203.0.113.94, lip=198.51.100.1, TLS
+Jan 15 03:51:04 mail dovecot: imap-login: Login: user=<deploy>, method=PLAIN, rip=203.0.113.95, lip=198.51.100.1, TLS

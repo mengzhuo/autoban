@@ -1,0 +1,3 @@
+Jan 15 03:54:00 ftp vsftpd[1234]: [admin] FAIL LOGIN: Client "203.0.113.100"
+Jan 15 03:54:02 ftp vsftpd[1234]: [test] FAIL LOGIN: Client "203.0.113.101"
+Jan 15 03:54:04 ftp vsftpd[1234]: [deploy] OK LOGIN: Client "203.0.113.102"

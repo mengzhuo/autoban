@@ -1,0 +1,3 @@
+Jan 15 05:02:00 mail cyrus/imap[1234]: badlogin: [203.0.113.212] PLAIN [SASL(PLAIN)] invalid credentials
+Jan 15 05:02:02 mail cyrus/imap[1234]: badlogin: [203.0.113.213] LOGIN [SASL(LOGIN)] invalid credentials
+Jan 15 05:02:04 mail cyrus/imap[1234]: login: [203.0.113.214] deploy PLAIN User logged in

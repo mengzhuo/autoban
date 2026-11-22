@@ -34,7 +34,7 @@ The configuration format and `filter.d` / `action.d` semantics stay close to fai
 
 - **fail2ban-style configuration**: `gojail.conf` / `jail.conf` / `.local`, with `[DEFAULT]` inheritance, `%(option)s` interpolation, `[INCLUDES] before/after` and multi-line values.
 - **Filter engine**: `failregex`, `ignoreregex` and `prefregex`, with `<HOST>`, `<ADDR>`, `<SUBNET>`, `<USER>` and related placeholders.
-- **Bundled filters**: OpenSSH, nginx HTTP auth, Apache 2.4/2.2 auth and Caddy JSON 401 access logs.
+- **34 bundled filters**: SSH, web servers, web apps/panels, mail, FTP, VPN/VoIP, databases and infrastructure; see [docs/filters.md](docs/filters.md).
 - **Log timestamp detection**: built-in syslog, ISO-8601, nginx, Apache and epoch formats, plus custom `datepattern` support.
 - **Full ban lifecycle**: `maxretry`, `findtime`, `bantime`, permanent bans, `ignoreip`, `ignorecommand` and `bantime.increment`.
 - **Action system**: `actioncheck/start/stop/ban/unban/flush`, multiple actions per jail, tag substitution, execution timeouts and process-group cleanup.
@@ -314,11 +314,12 @@ scripts/demo.sh   end-to-end demo
 .github/          GitHub Actions CI
 ```
 
-Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action timeouts, log rotation, end-to-end banning, restart recovery and hot reload. The filter suite also includes sanitized real-world OpenSSH, nginx, Apache and Caddy log fixtures under `internal/filter/testdata/`.
+Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action timeouts, log rotation, end-to-end banning, restart recovery and hot reload. The filter suite also includes sanitized real-world log fixtures for all bundled filters under `internal/filter/testdata/`.
 
 ## Documentation
 
 - [Configuration reference](docs/configuration.md)
+- [Bundled filter catalog](docs/filters.md)
 - [fail2ban feature analysis and gojail mapping](docs/fail2ban-analysis.md)
 - [systemd unit](contrib/gojail.service)
 - [sysusers definition](contrib/gojail.sysusers)

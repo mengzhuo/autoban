@@ -14,6 +14,9 @@ production logs.
 - `apache/access.log`: default/common Apache access logs, used to verify that
   the auth filter does not ban plain 401 access-log entries.
 - `caddy/access.log`: Caddy JSON access logs with 401, 200 and 502 responses.
+- `ssh/dropbear.log`, `web/*.log`, `webapps/*.log`, `mail/*.log`,
+  `ftp/*.log`, `vpn/openvpn.log`, `voip/asterisk.log`, `db/*.log` and
+  `other/*.log`: additional sanitized fixtures covering the bundled filters.
 
 The tests in `internal/filter/real_logs_test.go` load the shipped filters from
 `config/filter.d` and assert the match and per-host counts.

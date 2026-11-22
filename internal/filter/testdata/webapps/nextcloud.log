@@ -1,0 +1,3 @@
+{"reqId":"abc","level":2,"time":"2024-01-15T04:09:00+00:00","remoteAddr":"203.0.113.203","user":"admin","app":"core","method":"POST","url":"/login","message":"Login failed: admin (Remote IP: 203.0.113.203)","userAgent":"curl/8.0","version":"27.1.0.0","data":{"app":"core"}}
+{"reqId":"def","level":2,"time":"2024-01-15T04:09:02+00:00","remoteAddr":"203.0.113.204","user":"alice","app":"core","method":"POST","url":"/login","message":"Login failed: alice (Remote IP: 203.0.113.204)","userAgent":"curl/8.0","version":"27.1.0.0","data":{"app":"core"}}
+{"reqId":"ghi","level":1,"time":"2024-01-15T04:09:04+00:00","remoteAddr":"203.0.113.205","user":"deploy","app":"core","method":"GET","url":"/","message":"OK","userAgent":"curl/8.0","version":"27.1.0.0","data":{"app":"core"}}
