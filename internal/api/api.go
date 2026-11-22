@@ -58,6 +58,7 @@ type FailureInfo struct {
 type JailStatus struct {
 	Name             string    `json:"name"`
 	Filter           string    `json:"filter"`
+	FilterMode       string    `json:"filterMode,omitempty"`
 	Backend          string    `json:"backend"`
 	Files            []string  `json:"files"`
 	Actions          []string  `json:"actions"`

@@ -1,0 +1,3 @@
+Apr-07-13 07:08:36 [SSL-out] 203.0.113.77 SSL negotiation with client failed: SSL accept attempt failed with unknown errorerror:140760FC:SSL routines:SSL23_GET_CLIENT_HELLO:unknown protocol;
+Apr-07-13 07:10:37 [SSL-out] 203.0.113.78 SSL negotiation with client failed: SSL accept attempt failed with unknown errorerror:140760FC:SSL routines:SSL23_GET_CLIENT_HELLO:unknown protocol;
+Apr-27-13 02:25:09 Blocking 203.0.113.79 - too much AUTH errors (8);

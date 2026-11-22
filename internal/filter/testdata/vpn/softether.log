@@ -1,0 +1,3 @@
+2020-05-12 10:53:19.781 Connection "CID-72": User authentication failed. The user name that has been provided was "bob", from 203.0.113.63.
+2020-05-13T10:53:19 localhost [myserver.com/VPN/defaultvpn] (2020-05-13 10:53:19.591) <SECURITY_LOG>: Connection "CID-594": User authentication failed. The user name that has been provided was "alice", from 203.0.113.64.
+2020-05-13T10:53:21 localhost [myserver.com/VPN/defaultvpn] (2020-05-13 10:53:21.591) <SECURITY_LOG>: Connection "CID-595": User authentication succeeded. The user name that has been provided was "deploy".

@@ -1,0 +1,3 @@
+2015/10/29 20:01:02 [error] 256554#0: *99927 limiting requests, excess: 1.852 by zone "one", client: 203.0.113.251, server: example.com, request: "POST /index.htm HTTP/1.0", host: "example.com"
+2015/10/29 20:01:04 [error] 256554#0: *99928 limiting connections by zone "one", client: 203.0.113.252, server: example.com, request: "GET / HTTP/1.1", host: "example.com"
+2015/10/29 20:01:06 [error] 256554#0: *99929 open() "/var/www/missing" failed (2: No such file or directory), client: 203.0.113.253, server: example.com, request: "GET /missing HTTP/1.1", host: "example.com"

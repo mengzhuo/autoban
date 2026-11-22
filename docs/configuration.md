@@ -86,7 +86,7 @@ pollinterval = 1s
 | 选项 | 默认值 | 说明 |
 |---|---|---|
 | `enabled` | `false` | 是否在启动时启用 |
-| `filter` | 无 | `filter.d` 名称，必填（启用时） |
+| `filter` | 无 | `filter.d` 名称，必填（启用时）；支持 `name[mode=...]` 参数 |
 | `logpath` | 无 | 一个或多个日志路径/glob，换行或空格分隔 |
 | `backend` | `auto` | 仅支持 `auto` / `polling` |
 | `maxretry` | `5` | 触发封禁的失败次数 |
@@ -146,6 +146,7 @@ filter 文件读取 `[Definition]`，可以用 `[Init]` 定义被 `%(...)s` 引�
 | `prefregex` | 预匹配；可用 `<F-CONTENT>...</F-CONTENT>` 指定子片段 |
 | `datepattern` | 日志时间格式（strptime 子集） |
 | `maxlines` | 匹配行历史大小，默认 1 |
+| `mode` | 过滤器模式，如 `normal`、`aggressive`、`ddos`、`extra`；具体取决于 filter |
 | `usedns` | 过滤器级主机名策略（jail 可覆盖） |
 | `ignorecommand` | filter 级忽略命令（jail 可覆盖） |
 
@@ -158,7 +159,7 @@ failregex = ^.*Failed password for (?:invalid user )?\S+ from <HOST> port \d+(?:
 ignoreregex = ^.*from 192\.0\.2\.10 port .*$
 ```
 
-仓库自带 34 个过滤器，完整列表见 [filters.md](filters.md)。Apache 使用 error log（2.4 与 2.2 格式），Caddy 使用启用 access log 后的 JSON 日志（`logger=http.log.access` 且 `status=401`）。
+仓库自带 56 个过滤器，完整列表见 [filters.md](filters.md)。Apache 使用 error log（2.4 与 2.2 格式），Caddy 使用启用 access log 后的 JSON 日志（`logger=http.log.access` 且 `status=401`）。
 
 ### 4.1 正则 token
 

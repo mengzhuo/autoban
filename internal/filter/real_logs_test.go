@@ -297,6 +297,28 @@ func TestMoreRealLogFilters(t *testing.T) {
 		{"directadmin", "directadmin", "webapps/directadmin.log", 4, 3, map[string]int{"203.0.113.218": 1, "203.0.113.219": 1, "203.0.113.220": 1}},
 		{"froxlor", "froxlor-auth", "webapps/froxlor.log", 5, 4, map[string]int{"203.0.113.220": 1, "203.0.113.221": 1, "203.0.113.222": 1, "203.0.113.223": 1}},
 		{"portsentry", "portsentry", "other/portsentry.log", 3, 2, map[string]int{"203.0.113.217": 1, "203.0.113.218": 1}},
+		{"freeswitch", "freeswitch", "voip/freeswitch.log", 4, 3, map[string]int{"203.0.113.230": 1, "203.0.113.231": 1, "203.0.113.232": 1}},
+		{"apache-noscript", "apache-noscript", "web/apache-noscript.log", 4, 3, map[string]int{"203.0.113.240": 1, "203.0.113.241": 1, "203.0.113.242": 1}},
+		{"apache-overflows", "apache-overflows", "web/apache-overflows.log", 4, 4, map[string]int{"203.0.113.244": 1, "203.0.113.245": 1, "203.0.113.246": 1, "203.0.113.247": 1}},
+		{"apache-badbots", "apache-badbots", "web/apache-badbots.log", 3, 2, map[string]int{"203.0.113.248": 1, "203.0.113.249": 1}},
+		{"nginx-limit-req", "nginx-limit-req", "web/nginx-limit-req.log", 3, 2, map[string]int{"203.0.113.251": 1, "203.0.113.252": 1}},
+		{"nginx-forbidden", "nginx-forbidden", "web/nginx-forbidden.log", 2, 2, map[string]int{"203.0.113.254": 1, "203.0.113.255": 1}},
+		{"nginx-bad-request", "nginx-bad-request", "web/nginx-bad-request.log", 3, 2, map[string]int{"203.0.113.41": 1, "203.0.113.42": 1}},
+		{"nginx-botsearch", "nginx-botsearch", "web/nginx-botsearch.log", 4, 3, map[string]int{"203.0.113.44": 1, "203.0.113.45": 1, "203.0.113.46": 1}},
+		{"bitwarden", "bitwarden", "webapps/bitwarden.log", 3, 2, map[string]int{"203.0.113.60": 1, "203.0.113.61": 1}},
+		{"softethervpn", "softethervpn", "vpn/softether.log", 3, 2, map[string]int{"203.0.113.63": 1, "203.0.113.64": 1}},
+		{"sogo-auth", "sogo-auth", "webapps/sogo.log", 3, 2, map[string]int{"203.0.113.65": 1, "203.0.113.66": 1}},
+		{"groupoffice", "groupoffice", "webapps/groupoffice.log", 2, 1, map[string]int{"203.0.113.68": 1}},
+		{"horde", "horde", "webapps/horde.log", 2, 2, map[string]int{"203.0.113.70": 1, "203.0.113.71": 1}},
+		{"tine20", "tine20", "webapps/tine20.log", 2, 2, map[string]int{"203.0.113.72": 1, "203.0.113.73": 1}},
+		{"kerio", "kerio", "mail/kerio.log", 3, 3, map[string]int{"203.0.113.74": 1, "203.0.113.75": 1, "203.0.113.76": 1}},
+		{"assp", "assp", "mail/assp.log", 3, 3, map[string]int{"203.0.113.77": 1, "203.0.113.78": 1, "203.0.113.79": 1}},
+		{"centreon", "centreon", "webapps/centreon.log", 2, 2, map[string]int{"203.0.113.80": 1, "203.0.113.81": 1}},
+		{"stunnel", "stunnel", "other/stunnel.log", 2, 2, map[string]int{"203.0.113.82": 1, "203.0.113.83": 1}},
+		{"monit", "monit", "other/monit.log", 4, 4, map[string]int{"203.0.113.84": 1, "203.0.113.85": 1, "203.0.113.86": 1, "203.0.113.87": 1}},
+		{"sendmail-reject", "sendmail-reject", "mail/sendmail-reject.log", 2, 2, map[string]int{"203.0.113.88": 1, "203.0.113.89": 1}},
+		{"exim-spam", "exim-spam", "mail/exim-spam.log", 3, 3, map[string]int{"203.0.113.90": 1, "203.0.113.91": 1, "203.0.113.92": 1}},
+		{"courier-smtp", "courier-smtp", "mail/courier-smtp.log", 2, 2, map[string]int{"::ffff:203.0.113.93": 1, "::ffff:203.0.113.94": 1}},
 	}
 	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
 	for _, tc := range cases {
@@ -362,5 +384,48 @@ func TestAllBundledFiltersCompile(t *testing.T) {
 				t.Fatal(err)
 			}
 		})
+	}
+}
+
+func TestFreeswitchModes(t *testing.T) {
+	dirs := []string{filepath.Join("..", "..", "config")}
+	lines := []string{
+		`2013-12-31 17:39:54.767815 [WARNING] sofia_reg.c:1533 SIP auth challenge (INVITE) on sofia profile 'internal' for [011448708752617@192.168.2.51] from ip 203.0.113.230`,
+		`2013-12-31 17:39:54.767815 [WARNING] sofia_reg.c:1478 SIP auth failure (INVITE) on sofia profile 'internal' for [000972543480510@192.168.2.51] from ip 203.0.113.231`,
+		`2013-12-31 17:39:55.123456 [WARNING] sofia_reg.c:1534 Can't find user [admin@example.com] from 203.0.113.232`,
+	}
+	for _, tc := range []struct {
+		mode    string
+		matches int
+	}{
+		{"normal", 2},
+		{"ddos", 2},
+		{"extra", 3},
+	} {
+		fs, err := config.LoadFilter("freeswitch", dirs, map[string]string{"mode": tc.mode})
+		if err != nil {
+			t.Fatalf("%s: %v", tc.mode, err)
+		}
+		f, err := filter.Compile(filter.Options{
+			Name:        "freeswitch",
+			FailRegex:   fs.FailRegex,
+			IgnoreRegex: fs.IgnoreRegex,
+			PreRegex:    fs.PreRegex,
+			DatePattern: fs.DatePattern,
+			MaxLines:    fs.MaxLines,
+			UsedNS:      "no",
+		})
+		if err != nil {
+			t.Fatalf("%s: %v", tc.mode, err)
+		}
+		matched := 0
+		for _, line := range lines {
+			if _, ok := f.Match(line, time.Now()); ok {
+				matched++
+			}
+		}
+		if matched != tc.matches {
+			t.Fatalf("mode %s matched %d, want %d", tc.mode, matched, tc.matches)
+		}
 	}
 }

@@ -1,0 +1,4 @@
+[PDT Apr 16 21:05:29] error    : Warning: Client '203.0.113.84' supplied unknown user 'foo' accessing monit httpd
+[PDT Apr 16 20:59:33] error    : Warning: Client '203.0.113.85' supplied wrong password for user 'admin' accessing monit httpd
+Mar  9 09:18:28 hostname monit[5731]: HttpRequest: access denied -- client 203.0.113.86: missing or invalid Authorization header
+Mar  9 09:18:29 hostname monit[5731]: HttpRequest: access denied -- client 203.0.113.87: empty username

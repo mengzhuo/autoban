@@ -497,6 +497,7 @@ func (j *Jail) Status() api.JailStatus {
 	return api.JailStatus{
 		Name:             j.spec.Name,
 		Filter:           j.spec.Filter,
+		FilterMode:       j.spec.FilterMode,
 		Backend:          j.spec.Backend,
 		Files:            files,
 		Actions:          actionNames,

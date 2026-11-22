@@ -1,0 +1,4 @@
+[Sat Mar 15 16:04:06.105212 2010] [core:error] [pid 17408] [client 203.0.113.244:55280] AH00126: Invalid URI in request GET /static/../../../a/../../../../etc/passwd HTTP/1.1
+[Fri Jul 30 11:23:54 2010] [error] [client 203.0.113.245] request failed: URI too long (longer than 8190)
+[Tue Mar 16 15:39:29 2010] [error] [client 203.0.113.246] Invalid method in request
+[Sat Mar 15 16:04:07.105212 2010] [core:error] [pid 17408] [client 203.0.113.247:55281] AH00135: Invalid method in request "BAD"

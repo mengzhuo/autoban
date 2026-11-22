@@ -143,9 +143,16 @@ func (e *Engine) buildJail(spec config.JailSpec, snapshot *ban.Snapshot) (*jail.
 	default:
 		return nil, fmt.Errorf("backend %q is not supported (use auto or polling)", spec.Backend)
 	}
-	fs, err := config.LoadFilter(spec.Filter, e.dirs, map[string]string{"__name__": spec.Name})
+	filterExtra := map[string]string{"__name__": spec.Name}
+	for k, v := range spec.FilterParams {
+		filterExtra[k] = v
+	}
+	fs, err := config.LoadFilter(spec.Filter, e.dirs, filterExtra)
 	if err != nil {
 		return nil, err
+	}
+	if fs.Mode != "" {
+		spec.FilterMode = fs.Mode
 	}
 	if spec.MaxLines <= 0 {
 		spec.MaxLines = fs.MaxLines

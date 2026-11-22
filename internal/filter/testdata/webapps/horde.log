@@ -1,0 +1,2 @@
+Nov 11 18:57:57 mail HORDE [error] [horde] FAILED LOGIN for graham [203.0.113.70] to Horde [on line 116 of "/home/ace-hosting/public_html/horde/login.php"]
+Dec 15 08:59:59 mail HORDE [error] [imp] FAILED LOGIN for user@example.com [203.0.113.71] to {mx.example.com:993 [imap/ssl/novalidate-cert]} [pid 68394 on line 139 of /usr/local/www/horde/imp/lib/Auth/imp.php]

@@ -1,0 +1,2 @@
+2018/09/14 19:03:05 [error] 2035#2035: *9134 access forbidden by rule, client: 203.0.113.254, server: www.example.net, request: "GET /secret HTTP/1.1", host: "www.example.net"
+2018/09/14 19:03:07 [error] 2035#2035: *9135 access forbidden by rule, client: 203.0.113.255, server: www.example.net, request: "GET /admin HTTP/1.1", host: "www.example.net"

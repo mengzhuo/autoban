@@ -1,0 +1,3 @@
+Mar 24 08:58:32 mail sogod [26818]: SOGoRootPage Login from '203.0.113.65' for user 'hack0r' might not have worked - password policy: 65535  grace: -1  expire: -1  bound: 0
+Mar 24 08:58:40 mail sogod [26818]: SOGoRootPage Login from '203.0.113.66' for user 'kiddy' might not have worked - password policy: 65535  grace: -1  expire: -1  bound: 0
+Mar 24 08:58:42 mail sogod [26818]: SOGoRootPage successful login from '203.0.113.67' for user 'deploy'

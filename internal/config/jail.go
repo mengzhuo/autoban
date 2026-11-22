@@ -44,6 +44,8 @@ type JailSpec struct {
 	UsedNS           string
 	UsedNSExplicit   bool
 	IgnoreCommand    string
+	FilterParams     map[string]string
+	FilterMode       string
 	MaxLines         int
 	BanTimeIncrement bool
 	BanTimeFactor    float64
@@ -57,6 +59,7 @@ type JailSpec struct {
 // FilterSpec is a resolved filter.d configuration.
 type FilterSpec struct {
 	Name          string
+	Mode          string
 	FailRegex     []string
 	IgnoreRegex   []string
 	PreRegex      string
@@ -268,7 +271,13 @@ func resolveJail(c *Config, name string, pollDefault time.Duration) (JailSpec, e
 	if v, ok, err := get("filter"); err != nil {
 		return spec, err
 	} else if ok {
-		spec.Filter = strings.TrimSpace(v)
+		ref, err := parseActionRef(strings.TrimSpace(v))
+		if err != nil {
+			return spec, fmt.Errorf("filter: %w", err)
+		}
+		spec.Filter = ref.Name
+		spec.FilterParams = ref.Params
+		spec.FilterMode = ref.Params["mode"]
 	}
 	if v, ok, err := get("logpath"); err != nil {
 		return spec, err
@@ -464,12 +473,28 @@ func LoadFilter(name string, dirs []string, extra map[string]string) (*FilterSpe
 	for k, v := range extra {
 		initExtra[k] = v
 	}
+	if _, ok := initExtra["mode"]; !ok {
+		if v, ok, err := resolveOptional(c, "Definition", "mode", initExtra); err != nil {
+			return nil, fmt.Errorf("filter %s mode: %w", name, err)
+		} else if ok {
+			initExtra["mode"] = v
+		}
+	}
 
+	expand := func(v string) (string, error) {
+		return c.ExpandTags(v, "Definition", initExtra)
+	}
 	get := func(key string) (string, bool, error) {
-		return resolveOptional(c, "Definition", key, initExtra)
+		v, ok, err := resolveOptional(c, "Definition", key, initExtra)
+		if err != nil || !ok {
+			return v, ok, err
+		}
+		v, err = expand(v)
+		return v, true, err
 	}
 	spec := &FilterSpec{
 		Name:     name,
+		Mode:     initExtra["mode"],
 		Init:     initExtra,
 		MaxLines: 1,
 	}

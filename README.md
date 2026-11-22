@@ -34,7 +34,8 @@ The configuration format and `filter.d` / `action.d` semantics stay close to fai
 
 - **fail2ban-style configuration**: `gojail.conf` / `jail.conf` / `.local`, with `[DEFAULT]` inheritance, `%(option)s` interpolation, `[INCLUDES] before/after` and multi-line values.
 - **Filter engine**: `failregex`, `ignoreregex` and `prefregex`, with `<HOST>`, `<ADDR>`, `<SUBNET>`, `<USER>` and related placeholders.
-- **34 bundled filters**: SSH, web servers, web apps/panels, mail, FTP, VPN/VoIP, databases and infrastructure; see [docs/filters.md](docs/filters.md).
+- **Filter modes and parameters**: `filter = name[mode=aggressive]`, recursive `<mode>` / `<mdre-<mode>>` tag expansion and per-filter option overrides.
+- **56 bundled filters**: SSH, web servers, web apps/panels, mail, FTP, VPN/VoIP, databases and infrastructure; see [docs/filters.md](docs/filters.md).
 - **Log timestamp detection**: built-in syslog, ISO-8601, nginx, Apache and epoch formats, plus custom `datepattern` support.
 - **Full ban lifecycle**: `maxretry`, `findtime`, `bantime`, permanent bans, `ignoreip`, `ignorecommand` and `bantime.increment`.
 - **Action system**: `actioncheck/start/stop/ban/unban/flush`, multiple actions per jail, tag substitution, execution timeouts and process-group cleanup.

@@ -275,8 +275,12 @@ func printJailStatus(st api.JailStatus) {
 		fmt.Printf("   `- Banned IP list: %s\n", strings.Join(st.BannedIPs, " "))
 	}
 	fmt.Println()
-	fmt.Printf("Configuration: filter=%s backend=%s maxretry=%d findtime=%s bantime=%s usedns=%s\n",
-		st.Filter, st.Backend, st.MaxRetry, time.Duration(st.FindTime)*time.Second, banTimeString(st.BanTime), st.UsedNS)
+	mode := ""
+	if st.FilterMode != "" {
+		mode = " mode=" + st.FilterMode
+	}
+	fmt.Printf("Configuration: filter=%s%s backend=%s maxretry=%d findtime=%s bantime=%s usedns=%s\n",
+		st.Filter, mode, st.Backend, st.MaxRetry, time.Duration(st.FindTime)*time.Second, banTimeString(st.BanTime), st.UsedNS)
 	fmt.Printf("Ignore IP: %s\n", strings.Join(st.IgnoreIP, " "))
 	fmt.Printf("Actions: %s\n", strings.Join(st.Actions, ", "))
 }

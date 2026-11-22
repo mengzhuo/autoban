@@ -1,0 +1,2 @@
+Feb 25 03:01:10 mail sm-acceptingconnections[27713]: s1P819mk027713: ruleset=check_rcpt, arg1=<user@example.com>, relay=host.example [203.0.113.88], reject=550 5.7.1 <user@example.com>... Relaying denied. Proper authentication required.
+Feb 23 21:36:14 mail sm-mta[22248]: s1NLaDQT022248: ruleset=check_rcpt, arg1=<user@example.com>, relay=host.example [203.0.113.89] (may be forged), reject=421 4.3.2 Too many open connections.

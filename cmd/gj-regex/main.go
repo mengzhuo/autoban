@@ -19,6 +19,7 @@ func main() {
 		configFlag = flag.String("config", "", "comma-separated configuration directories")
 		usedns     = flag.String("usedns", "", "override usedns: yes, no, warn or raw")
 		datepat    = flag.String("datepattern", "", "override datepattern")
+		mode       = flag.String("mode", "", "filter mode (normal, aggressive, ddos, extra, ...)")
 		verbose    = flag.Bool("v", false, "print every matched line")
 	)
 	flag.Usage = func() {
@@ -41,7 +42,11 @@ func main() {
 		}
 	}
 
-	fs, err := config.LoadFilter(filterArg, dirs, nil)
+	filterExtra := map[string]string{}
+	if *mode != "" {
+		filterExtra["mode"] = *mode
+	}
+	fs, err := config.LoadFilter(filterArg, dirs, filterExtra)
 	if err != nil {
 		if !looksLikeRegex(filterArg) {
 			fatal(err)
