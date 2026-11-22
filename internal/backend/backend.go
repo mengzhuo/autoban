@@ -220,7 +220,7 @@ func (b *FileBackend) scanFileLocked(path string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open %s: %w", path, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	if _, err := f.Seek(state.offset, io.SeekStart); err != nil {
 		return nil, fmt.Errorf("seek %s: %w", path, err)
 	}

@@ -8,6 +8,7 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
 [![GitHub](https://img.shields.io/badge/GitHub-mengzhuo%2Fgojail-181717?logo=github)](https://github.com/mengzhuo/gojail)
+[![CI](https://github.com/mengzhuo/gojail/actions/workflows/ci.yml/badge.svg)](https://github.com/mengzhuo/gojail/actions/workflows/ci.yml)
 
 gojail 持续读取 SSH、nginx、Apache 等日志，用 `failregex` 识别失败登录、扫描和认证错误；在 `findtime` 内累计到 `maxretry` 后执行 `actionban`，封禁到期后自动执行 `actionunban`。
 
@@ -279,6 +280,8 @@ make vet        # go vet
 make demo       # 端到端演示
 ```
 
+GitHub Actions 会运行四个独立任务：`fmt`、`lint`、`build`、`test`，配置见 [.github/workflows/ci.yml](.github/workflows/ci.yml)。
+
 项目结构：
 
 ```text
@@ -298,6 +301,7 @@ config/           演示配置与动作/过滤器示例
 docs/             功能分析与配置参考
 contrib/          systemd unit
 scripts/demo.sh   端到端演示
+.github/          GitHub Actions CI
 ```
 
 测试覆盖配置解析、IPv4/IPv6、日期格式、封禁策略、动作超时、日志轮转、端到端封禁、重启恢复和热重载。

@@ -8,6 +8,7 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
 [![GitHub](https://img.shields.io/badge/GitHub-mengzhuo%2Fgojail-181717?logo=github)](https://github.com/mengzhuo/gojail)
+[![CI](https://github.com/mengzhuo/gojail/actions/workflows/ci.yml/badge.svg)](https://github.com/mengzhuo/gojail/actions/workflows/ci.yml)
 
 gojail watches SSH, nginx, Apache and other logs, matches failed logins, scans and authentication errors with `failregex`, counts failures per host within `findtime`, and runs `actionban` once `maxretry` is reached. Bans are removed automatically with `actionunban` when `bantime` expires.
 
@@ -279,6 +280,8 @@ make vet        # go vet
 make demo       # end-to-end demo
 ```
 
+GitHub Actions runs four independent jobs: `fmt`, `lint`, `build` and `test`; see [.github/workflows/ci.yml](.github/workflows/ci.yml).
+
 Project layout:
 
 ```text
@@ -298,6 +301,7 @@ config/           demo configuration, filters and actions
 docs/             analysis and configuration reference
 contrib/          systemd unit
 scripts/demo.sh   end-to-end demo
+.github/          GitHub Actions CI
 ```
 
 Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action timeouts, log rotation, end-to-end banning, restart recovery and hot reload.

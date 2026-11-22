@@ -287,9 +287,9 @@ func printBanned(bans []api.BanInfo) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-	fmt.Fprintln(w, "IP\tBANNED AT\tEXPIRES\tBANTIME\tFAILURES\tCOUNT")
+	_, _ = fmt.Fprintln(w, "IP\tBANNED AT\tEXPIRES\tBANTIME\tFAILURES\tCOUNT")
 	for _, b := range bans {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%d\n",
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%d\n",
 			b.IP, formatTime(b.Start), formatUntil(b), banTimeString(b.Duration), b.Failures, b.BanCount)
 	}
 	_ = w.Flush()
@@ -301,9 +301,9 @@ func printFailures(fs []api.FailureInfo) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-	fmt.Fprintln(w, "IP\tFAILURES\tFIRST SEEN\tLAST SEEN")
+	_, _ = fmt.Fprintln(w, "IP\tFAILURES\tFIRST SEEN\tLAST SEEN")
 	for _, f := range fs {
-		fmt.Fprintf(w, "%s\t%d\t%s\t%s\n", f.IP, f.Count, formatTime(f.FirstSeen), formatTime(f.LastSeen))
+		_, _ = fmt.Fprintf(w, "%s\t%d\t%s\t%s\n", f.IP, f.Count, formatTime(f.FirstSeen), formatTime(f.LastSeen))
 	}
 	_ = w.Flush()
 }

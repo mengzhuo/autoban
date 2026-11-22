@@ -123,7 +123,7 @@ func (c *Client) Do(req Request, out any) error {
 	if err != nil {
 		return fmt.Errorf("connect %s: %w", c.Socket, err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	_ = conn.SetDeadline(time.Now().Add(timeout))
 	enc := json.NewEncoder(conn)
 	if err := enc.Encode(req); err != nil {

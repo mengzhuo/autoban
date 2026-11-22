@@ -103,7 +103,7 @@ func (s *Store) Save(states map[string]ban.Snapshot) error {
 	}
 	ok := false
 	defer func() {
-		f.Close()
+		_ = f.Close()
 		if !ok {
 			_ = os.Remove(tmp)
 		}

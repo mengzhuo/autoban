@@ -255,7 +255,7 @@ func (c *Config) loadFile(path string, stack []string) error {
 	stack = append(stack, abs)
 
 	if inc := parsed.sections["INCLUDES"]; inc != nil {
-		before, _ := inc.values["before"]
+		before := inc.values["before"]
 		if err := c.loadIncludes(before, filepath.Dir(abs), stack); err != nil {
 			return fmt.Errorf("%s: before includes: %w", abs, err)
 		}
@@ -270,7 +270,7 @@ func (c *Config) loadFile(path string, stack []string) error {
 	c.files = append(c.files, abs)
 
 	if inc := parsed.sections["INCLUDES"]; inc != nil {
-		after, _ := inc.values["after"]
+		after := inc.values["after"]
 		if err := c.loadIncludes(after, filepath.Dir(abs), stack); err != nil {
 			return fmt.Errorf("%s: after includes: %w", abs, err)
 		}

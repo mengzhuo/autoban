@@ -80,7 +80,7 @@ func main() {
 		if err != nil {
 			fatal(err)
 		}
-		defer in.Close()
+		defer func() { _ = in.Close() }()
 	}
 	scanner := bufio.NewScanner(in)
 	scanner.Buffer(make([]byte, 64*1024), 4*1024*1024)
