@@ -1,3 +1,4 @@
-Jan 15 03:55:00 ftp proftpd[1234] host (203.0.113.101[203.0.113.101]): USER admin (Login failed): Incorrect password.
-Jan 15 03:55:02 ftp proftpd[1234] host (203.0.113.102[203.0.113.102]): USER test (Login failed): Incorrect password.
-Jan 15 03:55:04 ftp proftpd[1234] host (203.0.113.103[203.0.113.103]): USER deploy (Login successful).
+Jan 10 00:00:00 ftp proftpd[12345] ftp.example (203.0.113.101[203.0.113.101]): USER username (Login failed): User in /etc/ftpusers
+Feb 1 00:00:00 ftp proftpd[12346] ftp.example (203.0.113.102[203.0.113.102]): USER username: no such user found from 203.0.113.102 [203.0.113.102] to 198.51.100.1:21
+Jun 13 22:07:23 ftp proftpd[15719] ftp.example (203.0.113.103[203.0.113.103]): SECURITY VIOLATION: root login attempted.
+May 31 10:53:25 ftp proftpd[15302] ftp.example (203.0.113.104[203.0.113.104]) - Maximum login attempts (3) exceeded

@@ -1,3 +1,4 @@
-203.0.113.77 - - [15/Jan/2024:03:43:00 +0000] "GET /admin HTTP/1.1" 401 123 "-" "curl/8.0" 1 "http-in@file" "http://example.com/admin" 1ms
-203.0.113.78 - - [15/Jan/2024:03:43:02 +0000] "GET / HTTP/1.1" 200 456 "-" "curl/8.0" 1 "http-in@file" "http://example.com/" 1ms
-2001:db8::78 - - [15/Jan/2024:03:43:04 +0000] "GET /admin HTTP/1.1" 401 123 "-" "curl/8.0" 1 "http-in@file" "http://example.com/admin" 1ms
+10.0.0.2 - - [18/Nov/2018:21:34:30 +0000] "GET /dashboard/ HTTP/2.0" 401 17 "-" "Mozilla/5.0" 72 "Auth for frontend-Host-traefik-0" "/dashboard/" 0ms
+10.0.0.3 - username [18/Nov/2018:21:34:34 +0000] "GET /dashboard/ HTTP/2.0" 401 17 "-" "Mozilla/5.0" 72 "Auth for frontend-Host-traefik-0" "/dashboard/" 0ms
+10.0.0.4 - username [18/Nov/2018:21:34:36 +0000] "GET /dashboard/ HTTP/2.0" 200 17 "-" "Mozilla/5.0" 72 "Auth for frontend-Host-traefik-0" "/dashboard/" 0ms
+2001:db8::77 - username [18/Nov/2018:21:34:38 +0000] "GET /dashboard/ HTTP/2.0" 401 17 "-" "Mozilla/5.0" 72 "Auth for frontend-Host-traefik-0" "/dashboard/" 0ms

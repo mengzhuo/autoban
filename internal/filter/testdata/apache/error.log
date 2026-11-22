@@ -5,3 +5,6 @@
 [Wed Oct 11 14:33:04.333333 2023] [auth_basic:error] [pid 1234:tid 5682] [client 2001:db8::20:54326] AH01617: user admin: authentication failure for "/admin": Password Mismatch
 [Wed Oct 11 14:33:00.111111 2023] [core:error] [pid 1234:tid 5680] [client 203.0.113.24:54323] AH00135: Invalid method in request "BAD"
 [Wed Oct 11 14:33:02.222222 2023] [mpm_event:notice] [pid 1234:tid 5681] AH00489: Apache/2.4.57 (Unix) configured
+[Sat Jul 20 21:11:44.147674 2013] [authz_owner:error] [pid 17540:tid 140122922129152] [client [2001:db8::21]:51548] AH01637: Authorization of user test-ipv6 to access /basic/file failed, reason: file owner dan does not match
+[Sat Jul 20 21:41:52.523931 2013] [auth_basic:error] [pid 17512:tid 140122964092672] [client 203.0.113.22:51396] AH01614: client used wrong authentication scheme: /basic/file
+[Sat Jul 20 21:44:06.867985 2013] [auth_digest:error] [pid 17540:tid 140123070736128] [client 203.0.113.23:51406] AH01792: user username: password mismatch: /digest/cant_get_me.html

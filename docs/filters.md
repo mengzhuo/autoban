@@ -2,6 +2,8 @@
 
 `config/filter.d/` 目前包含 34 个过滤器。所有过滤器都使用 RE2 兼容正则，并有对应的真实格式日志样本和测试，位于 `internal/filter/testdata/`。
 
+过滤器格式已对照 fail2ban 上游 `filter.d` 和 `tests/files/logs` 语料核对，差异与修正记录见 [upstream-review.md](upstream-review.md)。
+
 ## 系统与远程登录
 
 | Filter | 软件 | 典型日志 |
@@ -14,22 +16,22 @@
 | Filter | 软件 | 典型日志 |
 |---|---|---|
 | `nginx-http-auth` | nginx basic auth | `error.log` |
-| `apache-auth` | Apache 2.4 / 2.2 basic auth | `error.log` |
+| `apache-auth` | Apache 2.4 / 2.2 auth/authz | `error.log`，AH01617/18/14/37/1792 等 |
 | `caddy-auth` | Caddy | 启用 access log 后的 JSON 日志，`status=401` |
 | `lighttpd-auth` | lighttpd | `error.log` |
-| `haproxy-http-auth` | HAProxy | 带 `401` 的 access log |
-| `traefik-auth` | Traefik | Common/combined access log，`401` |
+| `haproxy-http-auth` | HAProxy | `<NOSRV>` 且 `401` 的 access log |
+| `traefik-auth` | Traefik | Common/combined access log，命名用户 + `401` |
 
 ## Web 应用与控制面板
 
 | Filter | 软件 | 典型日志 |
 |---|---|---|
 | `nextcloud-auth` | Nextcloud | JSON 日志中的 `Login failed` |
-| `roundcube` | Roundcube | `errors.log` 中的 `Failed login` |
+| `roundcube-auth` | Roundcube | `FAILED login` / `IMAP Error: Login failed` |
 | `phpmyadmin-syslog` | phpMyAdmin | syslog 中的 `user denied` |
-| `webmin-auth` | Webmin | `miniserv.log` / syslog 中的 `Invalid login` |
-| `directadmin` | DirectAdmin | DirectAdmin 登录日志 |
-| `froxlor-auth` | Froxlor | Froxlor 登录日志 |
+| `webmin-auth` | Webmin | `Invalid login` / `Non-existent login` |
+| `directadmin` | DirectAdmin | `N failed login attempts` |
+| `froxlor-auth` | Froxlor | classic `[Login Action IP]` / JSON `"user":"IP"` |
 
 ## 邮件
 
@@ -37,8 +39,8 @@
 |---|---|---|
 | `postfix` | Postfix | `mail.log`：SASL 失败、Relay access denied |
 | `exim` | Exim | `mainlog`：认证失败、relay not permitted |
-| `sendmail-auth` | Sendmail | `maillog`：AUTH 失败、Relaying denied |
-| `dovecot` | Dovecot | `mail.log`：`auth failed`、PAM 认证失败 |
+| `sendmail-auth` | Sendmail | `possible SMTP attack: command=AUTH`、`AUTH failure` |
+| `dovecot` | Dovecot | `auth failed`、PAM、`auth-worker`、v2.4 `Login aborted` |
 | `courier-auth` | Courier | `authdaemond` 认证失败 |
 | `cyrus-imap` | Cyrus IMAP | `badlogin` |
 | `zimbra-auth` | Zimbra | `mailbox.log` 中的 SOAP `authentication failed` |
@@ -62,9 +64,9 @@
 
 | Filter | 软件 | 典型日志 |
 |---|---|---|
-| `mysql-auth` | MySQL / MariaDB | error log 中的 `Access denied` |
-| `mssql-auth` | Microsoft SQL Server | `Logon Error: 18456` |
-| `mongodb-auth` | MongoDB | JSON 日志中的 `Authentication failed` |
+| `mysqld-auth` | MySQL / MariaDB | error log 中的 `Access denied` |
+| `mssql-auth` | Microsoft SQL Server | `Login failed for user ... [CLIENT: IP]` |
+| `mongodb-auth` | MongoDB | MongoDB 4+ JSON 日志中的 `Authentication failed` |
 
 ## 其他基础设施
 
@@ -72,19 +74,25 @@
 |---|---|---|
 | `samba` | Samba | `check_ntlm_password` 认证失败 |
 | `jenkins-auth` | Jenkins | `jenkins.log` 中的 `Login failure` |
-| `squid` | Squid | access log 中的 `407` |
+| `squid` | Squid | `TCP_DENIED/403` 或 `NONE/405` |
 | `rsync` | rsync daemon | `auth failed on module` |
-| `portsentry` | PortSentry | `attackalert: Connect from host` |
+| `portsentry` | PortSentry | `Host: IP/IP Port: N TCP|UDP Blocked` |
 
-## 未内置的软件
+## 尚未移植的上游过滤器
 
-以下软件没有稳定、默认、且包含来源 IP 的失败日志格式，因此没有直接内置过滤器：
+Gojail 当前内置 34 个主流过滤器；上游 fail2ban 还有约 70 个 filter 尚未移植，例如：
 
-- WordPress / Drupal / Joomla：核心默认不记录失败登录；通常依赖安全插件、Web 服务器 401/403 access log 或数据库 watchdog。
-- SoftEther VPN、FreeSWITCH、Kamailio、FreeRADIUS、strongSwan：日志字段和连接/IP 关联方式差异较大，建议按实际版本自定义。
-- Bitwarden、Sogo、Horde、Group-Office、Tine 2.0、TWiki、Zope、Wowza、Kerio：产品专用格式，建议按部署版本补 filter。
+- Web 服务器/应用：`apache-badbots`、`apache-noscript`、`apache-overflows`、`nginx-limit-req`、`nginx-botsearch`
+- 协作/面板：`bitwarden`、`sogo-auth`、`horde`、`groupoffice`、`tine20`、`kerio`
+- VPN/VoIP：`softethervpn`、`freeswitch`
+- 其他：`assp`、`centreon`、`stunnel`、`monit` 等
 
-这些软件仍然可以通过自定义 `failregex` 接入。参考现有 filter 的结构，并在 `internal/filter/testdata/` 添加脱敏日志样本即可。
+这些过滤器依赖各自的产品日志格式，可以按同样方式继续补充。当前未移植不代表不支持该软件，自定义 `failregex` 仍可使用。
+
+以下软件核心默认没有稳定、包含来源 IP 的失败日志，通常需要插件/访问日志/ACL 方案：
+
+- WordPress / Drupal / Joomla：依赖安全插件、Web 服务器 401/403 access log 或数据库 watchdog。
+- FreeRADIUS、strongSwan、Kamailio：日志字段和连接/IP 关联方式差异较大，建议按实际版本自定义。
 
 ## 使用方式
 

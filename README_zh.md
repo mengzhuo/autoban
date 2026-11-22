@@ -314,12 +314,13 @@ scripts/demo.sh   端到端演示
 .github/          GitHub Actions CI
 ```
 
-测试覆盖配置解析、IPv4/IPv6、日期格式、封禁策略、动作超时、日志轮转、端到端封禁、重启恢复和热重载。过滤器测试还包含所有内置过滤器的脱敏真实格式日志样本，位于 `internal/filter/testdata/`。
+测试覆盖配置解析、IPv4/IPv6、日期格式、封禁策略、动作超时、日志轮转、端到端封禁、重启恢复和热重载。过滤器测试还包含所有内置过滤器的脱敏真实格式日志样本，位于 `internal/filter/testdata/`；格式已对照 fail2ban 上游 `filter.d` 和测试语料。
 
 ## 文档
 
 - [配置参考](docs/configuration.md)
 - [内置过滤器目录](docs/filters.md)
+- [fail2ban 上游源码核对记录](docs/upstream-review.md)
 - [fail2ban 功能分析与 gojail 实现映射](docs/fail2ban-analysis.md)
 - [systemd unit](contrib/gojail.service)
 - [sysusers 定义](contrib/gojail.sysusers)

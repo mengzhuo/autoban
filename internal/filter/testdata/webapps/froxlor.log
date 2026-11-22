@@ -1,3 +1,5 @@
-Jan 15 05:10:00 host froxlor: login failed for admin from 203.0.113.220
-Jan 15 05:10:02 host froxlor: login failed for test from 203.0.113.221
-Jan 15 05:10:04 host froxlor: login successful for deploy from 203.0.113.222
+May 21 00:56:27 host Froxlor: [Login Action 203.0.113.220] Unknown user 'user' tried to login.
+May 21 00:57:38 host Froxlor: [Login Action 203.0.113.221] User 'admin' tried to login with wrong password.
+2025-09-21T17:46:18.311379+02:00 host froxlor[1055219]: froxlor.WARNING: User tried to login with wrong password. {"source":"login","action":"50","user":"203.0.113.222"} []
+2025-09-21T16:30:13.118232+02:00 host froxlor[1054438]: froxlor.WARNING: Unknown user tried to login. {"source":"login","action":"50","user":"203.0.113.223"} []
+2025-09-21T16:31:13.118232+02:00 host froxlor[1054439]: froxlor.WARNING: User logged in. {"source":"login","action":"1","user":"deploy"} []

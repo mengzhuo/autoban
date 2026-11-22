@@ -1,3 +1,4 @@
-Jan 15 03:57:00 vpn openvpn[1234]: 203.0.113.110:54321 TLS: Username/Password authentication failed for username 'admin'
-Jan 15 03:57:02 vpn openvpn[1234]: 203.0.113.111:54322 TLS Error: TLS handshake failed
-Jan 15 03:57:04 vpn openvpn[1234]: 203.0.113.112:54323 VERIFY OK: depth=1, CN=Example CA
+Apr 25 10:57:36 vpn ovpn-server[901]: 203.0.113.110:10107 SIGUSR1[soft,connection-reset] received, client-instance restarting
+Apr 25 10:57:38 vpn ovpn-server[901]: 203.0.113.111:10108 TLS Error: TLS handshake failed
+Apr 25 10:57:40 vpn ovpn-server[901]: 203.0.113.112:10109 TLS: Username/Password authentication failed for username 'admin'
+Apr 25 10:57:42 vpn ovpn-server[901]: 203.0.113.113:10110 VERIFY OK: depth=1, CN=Example CA

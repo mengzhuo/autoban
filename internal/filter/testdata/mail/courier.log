@@ -1,3 +1,3 @@
-Jan 15 05:01:00 mail courier-authdaemon[1234]: authdaemond: failed to authenticate admin from 203.0.113.211
-Jan 15 05:01:02 mail courier-authdaemon[1234]: authdaemond: failed to authenticate test from 203.0.113.212
-Jan 15 05:01:04 mail courier-authdaemon[1234]: authdaemond: authenticated deploy
+Apr 23 21:59:01 dns2 imapd: LOGIN FAILED, user=sales@example.com, ip=[::ffff:203.0.113.211]
+Apr 23 21:59:38 dns2 pop3d: LOGIN FAILED, user=info@example.com, ip=[::ffff:203.0.113.212]
+Apr 23 21:59:40 dns2 imapd-ssl: LOGIN SUCCESS, user=deploy, ip=[::ffff:203.0.113.213]

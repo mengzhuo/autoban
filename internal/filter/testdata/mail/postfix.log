@@ -1,3 +1,4 @@
-Jan 15 03:50:00 mail postfix/smtpd[1234]: warning: unknown[203.0.113.90]: SASL LOGIN authentication failed: UGFzc3dvcmQ6
-Jan 15 03:50:02 mail postfix/smtpd[1234]: NOQUEUE: reject: RCPT from unknown[203.0.113.91]: 554 5.7.1 <spam@example.com>: Relay access denied; from=<a@example.com> to=<spam@example.com> proto=ESMTP helo=<x>
-Jan 15 03:50:04 mail postfix/smtpd[1234]: connect from unknown[203.0.113.92]
+Feb 21 09:21:54 mail postfix/smtpd[14398]: NOQUEUE: reject: RCPT from example.com[203.0.113.82]: 450 4.7.1 : Helo command rejected: Host not found; from=<> to=<> proto=ESMTP helo=
+Dec  2 22:24:22 mail postfix/smtpd[7676]: warning: 114-44-142-233.dynamic.hinet.net[203.0.113.80]: SASL CRAM-MD5 authentication failed: PDc3OTEwNTkyNTEyMzA2NDIuMTIyODI1MzA2MUBoZWw+
+Sep  6 00:44:56 mail postfix/submission/smtpd[11538]: warning: unknown[203.0.113.81]: SASL LOGIN authentication failed: UGFzc3dvcmQ6
+Sep  6 00:44:58 mail postfix/smtpd[11539]: connect from unknown[203.0.113.83]

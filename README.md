@@ -314,12 +314,13 @@ scripts/demo.sh   end-to-end demo
 .github/          GitHub Actions CI
 ```
 
-Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action timeouts, log rotation, end-to-end banning, restart recovery and hot reload. The filter suite also includes sanitized real-world log fixtures for all bundled filters under `internal/filter/testdata/`.
+Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action timeouts, log rotation, end-to-end banning, restart recovery and hot reload. The filter suite also includes sanitized real-world log fixtures for all bundled filters under `internal/filter/testdata/`; formats were cross-checked against fail2ban upstream `filter.d` and its test corpus.
 
 ## Documentation
 
 - [Configuration reference](docs/configuration.md)
 - [Bundled filter catalog](docs/filters.md)
+- [Upstream fail2ban source review](docs/upstream-review.md)
 - [fail2ban feature analysis and gojail mapping](docs/fail2ban-analysis.md)
 - [systemd unit](contrib/gojail.service)
 - [sysusers definition](contrib/gojail.sysusers)

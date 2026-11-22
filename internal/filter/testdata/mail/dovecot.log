@@ -1,3 +1,6 @@
-Jan 15 03:51:00 mail dovecot: auth: pam_unix(dovecot:auth): authentication failure; logname= uid=0 euid=0 tty=dovecot ruser=admin rhost=203.0.113.93
-Jan 15 03:51:02 mail dovecot: imap-login: Disconnected (auth failed, 1 attempts in 2 secs): user=<admin>, method=PLAIN, rip=203.0.113.94, lip=198.51.100.1, TLS
-Jan 15 03:51:04 mail dovecot: imap-login: Login: user=<deploy>, method=PLAIN, rip=203.0.113.95, lip=198.51.100.1, TLS
+@400000004c91b044077a9e94 mail dovecot-auth: pam_unix(dovecot:auth): authentication failure; logname= uid=0 euid=0 tty=dovecot ruser=web rhost=203.0.113.90
+Dec 12 11:19:11 mail dovecot: pop3-login: Aborted login (tried to use disabled plaintext auth): rip=203.0.113.91, lip=198.51.100.1
+Jun 13 16:30:54 mail dovecot: imap-login: Disconnected (auth failed, 2 attempts): user=<username.bob>, method=PLAIN, rip=203.0.113.92, lip=198.51.100.1, TLS
+Jun 12 19:07:29 mail dovecot[241]: imap-login: Login aborted: Connection closed (auth failed, 3 attempts in 16 secs) (auth_failed): user=<test>, method=PLAIN, rip=203.0.113.93, lip=198.51.100.1, TLS
+2013-08-11 03:56:40 mail auth-worker(default): Info: pam(username,203.0.113.94): pam_authenticate() failed: Authentication failure (password mismatch?)
+Jan 29 05:13:40 mail dovecot: imap-login: Login: user=<deploy>, method=PLAIN, rip=203.0.113.95, lip=198.51.100.1, TLS

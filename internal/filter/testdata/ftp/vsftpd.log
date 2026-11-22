@@ -1,3 +1,4 @@
-Jan 15 03:54:00 ftp vsftpd[1234]: [admin] FAIL LOGIN: Client "203.0.113.100"
-Jan 15 03:54:02 ftp vsftpd[1234]: [test] FAIL LOGIN: Client "203.0.113.101"
-Jan 15 03:54:04 ftp vsftpd[1234]: [deploy] OK LOGIN: Client "203.0.113.102"
+Oct 11 01:06:47 ftp vsftpd: (pam_unix) authentication failure; logname= uid=0 euid=0 tty= ruser= rhost=203.0.113.100
+Fri Jan 19 12:20:33 2007 [pid 27202] [anonymous] FAIL LOGIN: Client "203.0.113.101"
+Oct 23 21:15:42 ftp vsftpd: pam_unix(vsftpd:auth): authentication failure; logname= uid=0 euid=0 tty=ftp ruser=test rhost=203.0.113.102
+Oct 23 21:15:44 ftp vsftpd: pam_unix(vsftpd:auth): authentication success; logname= uid=0 euid=0 tty=ftp ruser=deploy rhost=203.0.113.103

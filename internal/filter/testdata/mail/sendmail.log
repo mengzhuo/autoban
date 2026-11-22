@@ -1,3 +1,3 @@
-Jan 15 05:00:00 mail sendmail[1234]: x0F1: AUTH=client [203.0.113.210] Authentication failed
-Jan 15 05:00:02 mail sendmail[1234]: x0F2: ruleset=check_rcpt, arg1=<spam@example.com>, relay=unknown [203.0.113.211], reject=550 5.7.1 <spam@example.com>... Relaying denied
-Jan 15 05:00:04 mail sendmail[1234]: x0F3: from=<a@example.com>, size=123, class=0, nrcpts=1
+Feb 16 23:33:20 smtp1 sm-mta[5133]: s1GNXHYB005133: [203.0.113.210]: possible SMTP attack: command=AUTH, count=5
+Feb 24 13:00:17 smtp1 sm-acceptingconnections[1499]: s1OHxxSn001499: host.example [203.0.113.211] (may be forged): possible SMTP attack: command=AUTH, count=6
+Feb 16 23:40:36 smtp1 sm-mta[5178]: s1GNeNqe005178: from=<a@example.com>, size=123, class=0, nrcpts=1

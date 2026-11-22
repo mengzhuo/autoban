@@ -1,3 +1,5 @@
-2024-01-15 03:41:00: (http_auth.c.900) password doesn't match for /admin (username "admin"), IP 203.0.113.73
-2024-01-15 03:41:02: (http_auth.c.882) user not found: test, IP 203.0.113.74
-2024-01-15 03:41:04: (connections.c.300) connection closed: 203.0.113.75
+2011-12-25 17:09:20: (http_auth.c.875) password doesn't match for /gitweb/ username: francois, IP: 203.0.113.73
+2012-09-26 10:24:35: (http_auth.c.1136) digest: auth failed for  xxx : wrong password, IP: 203.0.113.74
+2013-08-25 00:24:55: (http_auth.c.877) get_password failed, IP: 203.0.113.75
+2018-01-16 14:10:32: (mod_auth.c.525) password doesn't match for /test-url username: test, IP: 203.0.113.76
+2024-01-16 14:10:34: (connections.c.300) connection closed: 203.0.113.77

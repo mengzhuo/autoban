@@ -1,3 +1,4 @@
-[15-Jan-2024 04:07:00 +0000]: <abc123> Failed login for admin from 203.0.113.201 in /var/www/roundcube/program/lib/Roundcube/rcube_user.php on line 123
-[15-Jan-2024 04:07:02 +0000]: <def456> Failed login for test from 203.0.113.202 in /var/www/roundcube/program/lib/Roundcube/rcube_user.php on line 123
-[15-Jan-2024 04:07:04 +0000]: <ghi789> Successful login for deploy from 203.0.113.203 in /var/www/roundcube/program/lib/Roundcube/rcube_user.php on line 123
+[15-Jan-2024 04:07:00 +0000]: FAILED login for admin from 203.0.113.201
+Jan 15 04:07:02 mail roundcube: IMAP Error: Login failed for sales@example.com from 203.0.113.202. AUTHENTICATE PLAIN: A0002 NO Login failed. in /usr/share/roundcube/program/include/rcube_imap.php on line 205
+Jan 15 04:07:04 mail roundcube: IMAP Error: Login failed for admin from 127.0.0.1 from 203.0.113.203. AUTHENTICATE PLAIN: A0002 NO Login failed. in /usr/share/roundcube/program/include/rcube_imap.php on line 205
+Jan 15 04:07:06 mail roundcube: IMAP Error: Login succeeded for deploy from 203.0.113.204
