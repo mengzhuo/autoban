@@ -41,6 +41,7 @@ The configuration format and `filter.d` / `action.d` semantics stay close to fai
 - **Persistence**: bans, failure counters and ban history are stored in an atomic JSON snapshot; state is restored on restart and active rules are re-applied.
 - **Runtime control**: a Unix socket with a JSON protocol for status, jail start/stop, manual ban/unban, live option changes, flush and reload.
 - **Zero third-party dependencies**: standard library only; Linux target.
+- **Unprivileged operation**: the sample systemd unit runs as a dedicated user with only `CAP_NET_ADMIN` as an ambient capability.
 
 ## Quick Start
 
@@ -216,24 +217,30 @@ Data flow:
 sudo install -m 0755 bin/gojail bin/gj bin/gj-regex /usr/local/bin/
 
 # Install configuration (the demo config uses /tmp paths; adapt for production)
-sudo mkdir -p /etc/gojail
+sudo install -d /etc/gojail
 sudo cp config/gojail.conf config/jail.conf /etc/gojail/
 sudo cp -r config/filter.d config/action.d /etc/gojail/
 
-# Install the systemd unit
-sudo cp contrib/gojail.service /etc/systemd/system/
+# Create the service user/group and install the systemd unit
+sudo install -D -m 0644 contrib/gojail.sysusers /etc/sysusers.d/gojail.conf
+sudo systemd-sysusers
+sudo install -m 0644 contrib/gojail.service /etc/systemd/system/gojail.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now gojail
+
+# Allow an admin account to use the control socket (socket mode 0660)
+sudo usermod -aG gojail "$USER"
 ```
 
 Deployment notes:
 
-1. Use system paths such as `/etc/gojail`, `/run/gojail` and `/var/lib/gojail`.
-2. Run as root, or grant only `CAP_NET_ADMIN` and ensure action scripts are executable.
-3. Start with `banaction = dummy` to validate logs and regexes, then switch to `iptables-multiport`, `nftables` or `ufw`.
-4. The sample iptables action only handles IPv4; use an `ip6tables` variant for IPv6.
-5. Keep the control socket at `0660` and restrict it to an admin group.
-6. Prefer rename+create for log rotation; copytruncate has an edge case when the new content is longer than the old offset.
+1. The unit runs gojail as the unprivileged `gojail` user. Firewall access is limited to `CAP_NET_ADMIN` through `AmbientCapabilities=` / `CapabilityBoundingSet=`; full root is not required.
+2. Ensure the `gojail` user can read the monitored logs. The unit grants the `adm` supplementary group for Debian/Ubuntu `auth.log`. On systems with root-only logs (for example `/var/log/secure`), add an ACL or adjust `SupplementaryGroups=`.
+3. Admin users must be members of the `gojail` group to use `gj` over the `0660` socket. Re-login after changing group membership.
+4. The UFW action writes `/etc/ufw` and `/var/lib/ufw`. With `ProtectSystem=strict`, prefer iptables/nftables or add the required writable paths and permissions.
+5. Start with `banaction = dummy` to validate logs and regexes, then switch to `iptables-multiport`, `nftables` or `ufw`.
+6. The sample iptables action only handles IPv4; use an `ip6tables` variant for IPv6.
+7. Prefer rename+create for log rotation; copytruncate has an edge case when the new content is longer than the old offset.
 
 ## fail2ban Compatibility
 
@@ -260,12 +267,13 @@ gojail contains no fail2ban source code and is not wire-compatible with `fail2ba
 - Persistence uses a JSON snapshot rather than SQLite.
 - `prefregex` and `<F-MLFID>` support common cases only; there is no full multi-line state machine.
 - Linux only; relies on Unix sockets, flock and process-group signals.
-- The daemon does not drop privileges itself; run it under systemd.
+- The daemon does not drop privileges itself; use the provided systemd unit or run it as a dedicated user with the required capabilities.
 
 ## Security
 
 - Action scripts run through `/bin/sh -c`. `<ip>` is validated as an IP or strict hostname, but `<matches>` comes from logs and is attacker-controlled. **Never interpolate `<matches>` / `<ipmatches>` into a shell script without quoting.**
-- The project does not drop privileges. When running as root, an action-script mistake can affect the whole system.
+- The sample systemd unit runs gojail as an unprivileged user with only `CAP_NET_ADMIN`. If you start it manually as root, it does not drop privileges itself.
+- Prefer a dedicated service user (or `DynamicUser=yes`). Avoid shared accounts such as `nobody`/`nouser`; they make socket, state and log ownership harder to manage.
 - `usedns = raw` passes hostnames directly to action scripts; prefer `usedns = no` or `warn`.
 - The JSON database contains ban history and log fragments and is created with mode `0600`; protect it as sensitive data.
 - Validate rules with the `dummy` action before switching to real firewall actions.
@@ -299,7 +307,7 @@ internal/store/   JSON persistence
 internal/api/     socket protocol and client types
 config/           demo configuration, filters and actions
 docs/             analysis and configuration reference
-contrib/          systemd unit
+contrib/          systemd unit and sysusers definition
 scripts/demo.sh   end-to-end demo
 .github/          GitHub Actions CI
 ```
@@ -311,6 +319,7 @@ Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action t
 - [Configuration reference](docs/configuration.md)
 - [fail2ban feature analysis and gojail mapping](docs/fail2ban-analysis.md)
 - [systemd unit](contrib/gojail.service)
+- [sysusers definition](contrib/gojail.sysusers)
 - [Demo script](scripts/demo.sh)
 
 The detailed documentation is currently written in Chinese. The English README above is the default project overview.

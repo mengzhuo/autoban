@@ -396,4 +396,7 @@ Unix socket 使用换行分隔 JSON：
 - socket 权限限制为管理组；不要把 socket 暴露到不可信目录。
 - `usedns = raw` 会把主机名交给动作脚本，确认动作能安全处理。
 - 生产环境先使用 `dummy` 动作验证规则，再切换到真实防火墙动作。
+- 推荐使用 `contrib/gojail.service`：专用 `gojail` 用户 + `CAP_NET_ADMIN`，避免完整 root 权限。
+- 确保服务用户有日志读权限（Debian/Ubuntu 常用 `adm` 组；其他系统用 ACL）。
+- 控制 socket 属组为 `gojail`、模式 `0660`，管理员加入该组后使用 `gj`。
 - 以 root 运行时，定期审计 `action.d` 和命令参数。

@@ -1,0 +1,5 @@
+# Install as /etc/sysusers.d/gojail.conf, then run `systemd-sysusers`.
+# The gojail group owns the control socket (mode 0660); add admin users to it:
+#   sudo usermod -aG gojail <admin-user>
+g gojail -
+u gojail -:gojail "gojail daemon" /nonexistent /usr/sbin/nologin

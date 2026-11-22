@@ -41,6 +41,7 @@ gojail 持续读取 SSH、nginx、Apache 等日志，用 `failregex` 识别失�
 - **状态持久化**：封禁、失败计数、封禁历史写入 JSON 快照；重启恢复，并重新应用未过期规则。
 - **运行时控制**：Unix socket + JSON 协议，支持状态查询、启停 jail、手动封禁/解封、修改参数、热重载。
 - **零第三方依赖**：使用 Go 标准库；目标平台 Linux。
+- **非 root 运行**：示例 systemd unit 使用专用用户，仅授予 `CAP_NET_ADMIN` ambient capability。
 
 ## 快速开始
 
@@ -216,24 +217,30 @@ gj-regex ── 离线验证 filter
 sudo install -m 0755 bin/gojail bin/gj bin/gj-regex /usr/local/bin/
 
 # 安装配置（示例配置使用 /tmp 路径，生产环境请改成 /etc、/run、/var/lib）
-sudo mkdir -p /etc/gojail
+sudo install -d /etc/gojail
 sudo cp config/gojail.conf config/jail.conf /etc/gojail/
 sudo cp -r config/filter.d config/action.d /etc/gojail/
 
-# 安装 systemd unit
-sudo cp contrib/gojail.service /etc/systemd/system/
+# 创建服务用户/组并安装 systemd unit
+sudo install -D -m 0644 contrib/gojail.sysusers /etc/sysusers.d/gojail.conf
+sudo systemd-sysusers
+sudo install -m 0644 contrib/gojail.service /etc/systemd/system/gojail.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now gojail
+
+# 允许管理账号使用控制 socket（socket 模式 0660）
+sudo usermod -aG gojail "$USER"
 ```
 
 部署要点：
 
-1. 使用 `/etc/gojail`、`/run/gojail`、`/var/lib/gojail` 等系统路径。
-2. 以 root 运行，或只授予 `CAP_NET_ADMIN` 并确保动作脚本可执行。
-3. 先将 `banaction` 设为 `dummy` 验证日志和正则，再切换到 `iptables-multiport`、`nftables` 或 `ufw`。
-4. 示例 iptables 动作只处理 IPv4；IPv6 需要 `ip6tables` 变体。
-5. 控制 socket 建议设为 `0660`，只允许管理组访问。
-6. 日志轮转推荐 rename+create；copytruncate 在新内容长度大于旧偏移时存在边界情况。
+1. unit 以非 root 的 `gojail` 用户运行；通过 `AmbientCapabilities=` / `CapabilityBoundingSet=` 只授予 `CAP_NET_ADMIN`，不需要完整 root 权限。
+2. 确保 `gojail` 用户能读取被监控日志。unit 已加入 Debian/Ubuntu 的 `adm` 附加组以读取 `auth.log`；如果日志仅 root 可读（例如 `/var/log/secure`），请添加 ACL 或调整 `SupplementaryGroups=`。
+3. 管理账号需要加入 `gojail` 组才能通过 `0660` socket 使用 `gj`；修改组后需要重新登录。
+4. UFW 动作会写 `/etc/ufw` 和 `/var/lib/ufw`。在 `ProtectSystem=strict` 下建议使用 iptables/nftables，或额外开放可写路径和权限。
+5. 先将 `banaction` 设为 `dummy` 验证日志和正则，再切换到 `iptables-multiport`、`nftables` 或 `ufw`。
+6. 示例 iptables 动作只处理 IPv4；IPv6 需要 `ip6tables` 变体。
+7. 日志轮转推荐 rename+create；copytruncate 在新内容长度大于旧偏移时存在边界情况。
 
 ## fail2ban 兼容性
 
@@ -260,12 +267,13 @@ sudo systemctl enable --now gojail
 - 持久化是 JSON 快照，不是 SQLite。
 - `prefregex` 和 `<F-MLFID>` 只实现常见场景，没有完整多行状态机。
 - 仅支持 Linux；依赖 Unix socket、flock 和进程组信号。
-- 守护进程不自行降权，建议由 systemd 管理。
+- 守护进程不自行降权；请使用提供的 systemd unit，或以专用用户加所需 capability 运行。
 
 ## 安全注意事项
 
 - 动作脚本通过 `/bin/sh -c` 执行。`<ip>` 会经过 IP/主机名校验，但 `<matches>` 来自日志，攻击者可以控制内容。**不要在动作脚本中不加引号地插入 `<matches>` / `<ipmatches>`**。
-- 项目不负责降权；以 root 运行时，动作脚本错误可能影响系统。
+- 示例 systemd unit 以非 root 用户运行，并且只授予 `CAP_NET_ADMIN`。如果手动以 root 启动，程序本身不会主动降权。
+- 推荐使用专用服务用户（或 `DynamicUser=yes`），不建议使用 `nobody`/`nouser` 这类共享账号，因为 socket、状态目录和日志权限更难管理。
 - `usedns = raw` 会把主机名直接交给动作脚本；建议使用 `usedns = no` 或 `warn`。
 - JSON 数据库包含封禁历史和日志片段，权限为 `0600`，请按敏感数据保护。
 - 生产环境先使用 `dummy` 动作验证规则，再切换到真实防火墙动作。
@@ -299,7 +307,7 @@ internal/store/   JSON 持久化
 internal/api/     socket 协议与客户端类型
 config/           演示配置与动作/过滤器示例
 docs/             功能分析与配置参考
-contrib/          systemd unit
+contrib/          systemd unit 与 sysusers 定义
 scripts/demo.sh   端到端演示
 .github/          GitHub Actions CI
 ```
@@ -311,6 +319,7 @@ scripts/demo.sh   端到端演示
 - [配置参考](docs/configuration.md)
 - [fail2ban 功能分析与 gojail 实现映射](docs/fail2ban-analysis.md)
 - [systemd unit](contrib/gojail.service)
+- [sysusers 定义](contrib/gojail.sysusers)
 - [演示脚本](scripts/demo.sh)
 
 ## 参与贡献

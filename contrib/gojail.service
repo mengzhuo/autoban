@@ -1,18 +1,54 @@
 [Unit]
 Description=gojail intrusion prevention daemon
-Documentation=https://github.com/mengzhuo/gojail file:///etc/gojail/README.md
+Documentation=https://github.com/mengzhuo/gojail
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
+
+# Run as an unprivileged, dedicated service user. Create it with
+# contrib/gojail.sysusers or `useradd --system --user-group gojail`.
+User=gojail
+Group=gojail
+# Debian/Ubuntu: /var/log/auth.log is readable by the adm group.
+# Remove this line if your log files use different group/ACL permissions.
+SupplementaryGroups=adm
+
 ExecStart=/usr/local/bin/gojail -config /etc/gojail
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=2
-# Firewall actions usually need root or CAP_NET_ADMIN.
-User=root
-LimitNOFILE=65536
+
+# systemd creates and owns these directories for User=gojail. They match the
+# production paths in the configuration reference:
+#   /etc/gojail, /var/lib/gojail, /run/gojail, /var/log/gojail
+ConfigurationDirectory=gojail
+StateDirectory=gojail
+StateDirectoryMode=0750
+RuntimeDirectory=gojail
+RuntimeDirectoryMode=0750
+LogsDirectory=gojail
+LogsDirectoryMode=0750
+
+# Firewall actions (iptables/nftables) need CAP_NET_ADMIN only. Ambient
+# capabilities are inherited by child processes such as /bin/sh and nft.
+# Add CAP_NET_RAW only if a custom action requires raw sockets.
+AmbientCapabilities=CAP_NET_ADMIN
+CapabilityBoundingSet=CAP_NET_ADMIN
+
+# Hardening. Relax only the options needed by a custom action.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+UMask=0027
 
 [Install]
 WantedBy=multi-user.target
