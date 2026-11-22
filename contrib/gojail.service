@@ -1,0 +1,18 @@
+[Unit]
+Description=gojail intrusion prevention daemon
+Documentation=https://github.com/mengzhuo/gojail file:///etc/gojail/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/gojail -config /etc/gojail
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=2
+# Firewall actions usually need root or CAP_NET_ADMIN.
+User=root
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
