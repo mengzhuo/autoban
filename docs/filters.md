@@ -1,6 +1,6 @@
 # gojail 内置过滤器
 
-`config/filter.d/` 目前包含 56 个过滤器。所有过滤器都使用 RE2 兼容正则，并有对应的真实格式日志样本和测试，位于 `internal/filter/testdata/`。
+`config/filter.d/` 目前包含 103 个过滤器。所有过滤器都使用 RE2 兼容正则，并有对应的真实格式日志样本和测试，位于 `internal/filter/testdata/`。
 
 过滤器格式已对照 fail2ban 上游 `filter.d` 和 `tests/files/logs` 语料核对，差异与修正记录见 [upstream-review.md](upstream-review.md)。
 
@@ -100,15 +100,67 @@
 | `stunnel` | stunnel | 客户端证书失败 |
 | `monit` | Monit | HTTP Basic Auth 失败 |
 
+其余本轮新增的 47 个过滤器见上表。
+## 本轮新增的 47 个过滤器
+
+| Filter | 软件 / 场景 |
+|---|---|
+| `3proxy` | 3proxy 认证失败 |
+| `apache-botsearch` | Apache webmail/phpMyAdmin/WordPress 探测 |
+| `apache-fakegooglebot` | Apache Googlebot 访问日志（建议配合 ignorecommand 校验） |
+| `apache-modsecurity` | ModSecurity access denied |
+| `apache-nohome` | Apache `/~user` 枚举 |
+| `apache-pass` | knockd 风格 `/knocking/` 成功请求 |
+| `apache-shellshock` | Apache Shellshock CGI 探测 |
+| `authelia` | Authelia 认证失败 |
+| `counter-strike` | Counter-Strike Bad Rcon |
+| `cowrie` | Cowrie 新 SSH 会话 |
+| `dante` | Dante SOCKS 认证失败 |
+| `domino-smtp` | HCL Domino SMTP 认证失败 |
+| `drupal-auth` | Drupal watchdog 登录失败 |
+| `ejabberd-auth` | ejabberd c2s 认证失败 |
+| `gitlab` | GitLab 登录失败（文本/JSON） |
+| `grafana` | Grafana 用户名/密码错误 |
+| `gssftpd` | GSS FTP 重复登录失败 |
+| `guacamole` | Guacamole 认证失败 |
+| `monitorix` | Monitorix HTTP 访问错误 |
+| `murmur` | Murmur 拒绝连接 |
+| `nagios` | NRPE 主机不允许 |
+| `named-refused` | BIND 拒绝查询/区域传送 |
+| `nsd` | NSD 限速/ACL 拒绝 |
+| `openhab` | openHAB 401 |
+| `openwebmail` | OpenWebMail 登录/用户错误 |
+| `oracleims` | Oracle Messaging Server 密码错误 |
+| `pam-generic` | 通用 PAM 认证失败 |
+| `perdition` | Perdition 代理认证失败 |
+| `php-url-fopen` | PHP RFI access log |
+| `proxmox` | Proxmox VE 认证失败 |
+| `qmail` | qmail/rblsmtpd RBL 阻断 |
+| `recidive` | 重复封禁（兼容 fail2ban 与 gojail 日志） |
+| `routeros-auth` | MikroTik RouterOS 登录失败 |
+| `scanlogd` | scanlogd 扫描报告 |
+| `screensharingd` | macOS Screen Sharing 认证失败 |
+| `selinux-ssh` | SELinux SSH 失败审计 |
+| `sieve` | Cyrus timsieved 认证失败 |
+| `solid-pop3d` | Solid POP3 认证失败 |
+| `squirrelmail` | SquirrelMail 登录错误 |
+| `suhosin` | Suhosin attacker 告警 |
+| `uwimap-auth` | UW-IMAP/POP3 登录失败 |
+| `vaultwarden` | Vaultwarden 登录/2FA/admin 错误 |
+| `wuftpd` | wu-ftpd 登录失败 |
+| `xinetd-fail` | xinetd 访问控制失败 |
+| `xrdp` | xrdp-sesman 认证失败 |
+| `znc-adminlog` | ZNC 登录失败 |
+| `zoneminder` | ZoneMinder 登录失败 |
+
 ## 尚未移植的上游过滤器
 
-Gojail 当前内置 56 个主流过滤器；上游 fail2ban 还有约 48 个 filter 尚未移植，例如：
+当前还差 1 个上游过滤器：
 
-- Web 服务器：`apache-botsearch`、`apache-fakegooglebot`、`apache-modsecurity`、`apache-nohome`、`apache-pass`、`apache-shellshock`、`nginx-nohome`、`nginx-noscript`、`nginx-overflows`、`nginx-req-limit`、`nginx-shellshock`
-- 邮件：`exim-common`、`exim-spam` 已加一部分，仍有上游组合配置；`sendmail` 其余规则
-- 其他：`boinc`、`counter-strike`、`froxlor` 其他模式、`openhab`、`squid` 其他 ACL、`wowza` 等
+- `slapd`：OpenLDAP 的失败日志需要把同一 `conn=...` 的 `ACCEPT from IP=...` 与后续 `RESULT ... err=49` 关联起来，属于多行 ticket；当前 gojail 的单行匹配模型无法安全实现，暂未启用。
+- `apache-common`、`botsearch-common`、`common`、`exim-common`、`nginx-error-common`、`selinux-common` 是上游的 include 片段，不是独立 filter，本项目直接内联了所需规则。
 
-这些过滤器依赖各自的产品日志格式，可以按同样方式继续补充。当前未移植不代表不支持该软件，自定义 `failregex` 仍可使用。
+因此除 `slapd` 多行关联外，上游独立 filter 已全部覆盖。
 
 以下软件核心默认没有稳定、包含来源 IP 的失败日志，通常需要插件/访问日志/ACL 方案：
 

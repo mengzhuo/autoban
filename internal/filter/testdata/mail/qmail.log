@@ -1,0 +1,3 @@
+Sep  6 07:33:33 sd6 qmail: 1157520813.485077 rblsmtpd: 203.0.113.107 pid 19597 sbl-xbl.spamhaus.org: 451 http://www.spamhaus.org/query/bl?ip=203.0.113.107
+Sep  6 07:18:29 sd6 qmail: 1157519909.633171 qmail-smtpd: 421 badiprbl: ip 203.0.113.108 rbl: example.com
+Jun 30 15:13:33 ns1 rblsmtpd: example.com blocked 203.0.113.109 ordb-test.null.dk -

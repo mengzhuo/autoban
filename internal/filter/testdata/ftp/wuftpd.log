@@ -1,0 +1,2 @@
+Oct  6 09:59:26 myserver wu-ftpd[18760]: failed login from host.example [203.0.113.137]
+Mar 22 09:35:02 SiD wu-ftpd[31278]: pam_unix(wu-ftpd:auth): authentication failure; logname= uid=0 euid=0 tty= ruser= rhost=203.0.113.138  user=root

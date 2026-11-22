@@ -1,0 +1,2 @@
+Mar 11 22:52:12 lighttpd[53690]: (mod_fastcgi.c.2676) FastCGI-stderr: ALERT - configured request variable name length limit exceeded - dropped variable 'x' (attacker '203.0.113.129', file '/usr/local/index.php')
+Feb 26 22:52:29 host suhosin[9636]: ALERT - script tried to increase memory_limit to 268435456 bytes (attacker '203.0.113.130', file '/var/www/wp-admin/includes/image.php', line 161)

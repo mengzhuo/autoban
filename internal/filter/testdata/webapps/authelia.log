@@ -1,0 +1,3 @@
+time="2025-06-24T15:47:29+02:00" level=error msg="Unsuccessful 1FA authentication attempt by user 'example'" error="authentication failed" method=POST path=/api/firstfactor remote_ip=203.0.113.50
+time="2025-06-24T15:47:35+02:00" level=error msg="Unsuccessful TOTP authentication attempt by user 'john'" method=POST path=/api/secondfactor/totp remote_ip=203.0.113.51
+time="2025-06-24T15:50:00+02:00" level=info msg="Successful 1FA authentication attempt by user 'example'" method=POST path=/api/firstfactor remote_ip=203.0.113.52

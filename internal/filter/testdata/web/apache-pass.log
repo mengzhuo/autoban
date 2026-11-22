@@ -1,0 +1,2 @@
+203.0.113.36 - user1 [27/Jun/2013:11:55:44] "GET /knocking/ HTTP/1.1" 200 266 "http://example.com/" "Mozilla/5.0"
+203.0.113.37 - user1 [27/Jun/2013:11:55:46] "GET / HTTP/1.1" 200 266 "http://example.com/" "Mozilla/5.0"

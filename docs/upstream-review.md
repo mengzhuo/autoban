@@ -63,11 +63,11 @@ gojail 当前保留完整日志行做匹配，所以需要显式加前缀：
 
 ## 覆盖范围
 
-- 上游当前约有 104 个 `filter.d`；本项目目前内置 56 个，覆盖最常见的默认/normal 日志格式。
+- 上游当前约有 104 个 `filter.d`（其中 6 个是 include 片段）；本项目目前内置 103 个过滤器，除需要多行关联的 `slapd` 外，独立 filter 已覆盖。
 - 本次按上游测试语料核对了各 filter 的代表性日志；没有逐字复制上游正则，而是按 gojail 的单行匹配模型重写。
 - `filter = name[mode=...]` 参数和 `<mdre-<mode>>` 递归标签展开已实现；`freeswitch` 支持 normal/ddos/extra/aggressive。其他上游 filter 的 mode 分支尚未全部移植。
 - `fail2ban-regex` 上游测试语料中的部分场景依赖多行 ticket（尤其旧版 MongoDB）或 Python 正则 lookaround；这些场景未纳入当前单行 RE2 实现。
-- 上游还有 `apache-badbots`、`apache-noscript`、`nginx-limit-req`、`bitwarden`、`softethervpn`、`freeswitch`、`horde`、`sogo-auth`、`groupoffice`、`tine20`、`kerio` 等过滤器尚未移植；它们不是认证失败主路径，后续可以按同样方式补充。
+- 除 `slapd` 的多行连接关联外，上游独立 filter 已全部移植；`slapd` 需要将同一 `conn=` 的 ACCEPT 与后续 RESULT err=49 关联，当前单行模型不适用。
 
 ## 上游没有对应实现的过滤器
 

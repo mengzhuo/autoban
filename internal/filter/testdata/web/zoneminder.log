@@ -1,0 +1,2 @@
+[Mon Mar 28 16:50:49.522240 2016] [:error] [pid 1795] [client 203.0.113.146:50700] WAR [Login denied for user "username1"], referer: https://zoneminder/
+[Sun Mar 28 16:53:00.472693 2021] [php7:notice] [pid 11328] [client 203.0.113.147:39568] ERR [Could not retrieve user username1 details], referer: https://zm/

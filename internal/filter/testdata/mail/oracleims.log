@@ -1,0 +1,2 @@
+<co ts="2014-06-02T16:06:33.99" tr="TCP|192.245.12.223|25|203.0.113.97|4299" ap="SMTP" mi="Bad password" us="nic@example.com" di="535 5.7.8 Bad username or password (Authentication failed)."/>
+<co ts="2014-06-02T10:08:07.56" tr="TCP|192.245.12.223|25|203.0.113.98|56591" ap="SMTP" mi="Bad password" us="romeo@example.com" di="535 5.7.8 Bad username or password (Authentication failed)."/>

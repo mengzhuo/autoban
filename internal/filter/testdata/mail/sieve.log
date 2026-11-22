@@ -1,0 +1,2 @@
+Dec 1 20:36:56 mail sieve[23713]: badlogin: example.com[203.0.113.123] PLAIN authentication failure
+Jul 18 17:21:58 ophelia cyrus/timsieved[12305]: badlogin: example.com[203.0.113.124] PLAIN authentication failure

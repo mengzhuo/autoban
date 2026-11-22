@@ -1,0 +1,3 @@
+Feb 15 11:25:46 gw.local system,error,critical login failure for user admin from 203.0.113.113 via web
+Feb 15 11:57:42 gw.local system,error,critical login failure for user test from 203.0.113.114 via ssh
+Feb 15 11:26:15 gw.local system,info log rule changed by admin
