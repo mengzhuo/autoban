@@ -244,6 +244,23 @@ sudo usermod -aG gojail "$USER"
 6. 示例 iptables 动作只处理 IPv4；IPv6 需要 `ip6tables` 变体。
 7. 日志轮转推荐 rename+create；copytruncate 在新内容长度大于旧偏移时存在边界情况。
 
+### 安装包
+
+仓库可以直接构建 Debian 和 Alpine 包：
+
+```bash
+make deb       # dist/gojail_<version>_<arch>.deb
+make apk       # dist/gojail-<version>-r0.apk
+make packages  # 同时构建
+```
+
+两个包都显式依赖 `nftables`，并显式与 `fail2ban` 冲突。
+
+- Debian/Ubuntu：systemd 服务，专用 `gojail` 用户，只授予 `CAP_NET_ADMIN`，默认 SSH 日志为 `/var/log/auth.log`。
+- Alpine：OpenRC 服务，默认 SSH 日志为 `/var/log/messages`；由于 nftables 需要特权，当前以 root 运行。
+
+构建、安装、签名和卸载细节见 [docs/packaging.md](docs/packaging.md)。
+
 ## fail2ban 兼容性
 
 | 能力 | 状态 |
@@ -320,6 +337,7 @@ scripts/demo.sh   端到端演示
 ## 文档
 
 - [配置参考](docs/configuration.md)
+- [打包与安装](docs/packaging.md)
 - [内置过滤器目录](docs/filters.md)
 - [fail2ban 上游源码核对记录](docs/upstream-review.md)
 - [fail2ban 功能分析与 gojail 实现映射](docs/fail2ban-analysis.md)

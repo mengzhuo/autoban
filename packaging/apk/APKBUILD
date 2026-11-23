@@ -1,0 +1,36 @@
+# Alpine package definition.
+# Build with scripts/build-apk.sh; it creates the source tarball, injects the
+# checksum and runs abuild inside an Alpine container.
+pkgname=gojail
+pkgver=0.1.0
+pkgrel=0
+pkgdesc="Go implementation of fail2ban with nftables"
+url="https://github.com/mengzhuo/gojail"
+arch="x86_64 aarch64"
+license="MIT"
+maintainer="Meng Zhuo <mengzhuo@iscas.ac.cn>"
+depends="nftables !fail2ban"
+makedepends="go"
+options="!check !strip"
+install="$pkgname.pre-install $pkgname.post-install $pkgname.pre-deinstall"
+source="$pkgname-$pkgver.tar.gz"
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver"
+    CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o gojail ./cmd/gojail
+    CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o gj ./cmd/gj
+    CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o gj-regex ./cmd/gj-regex
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver"
+    install -Dm755 gojail "$pkgdir/usr/bin/gojail"
+    install -Dm755 gj "$pkgdir/usr/bin/gj"
+    install -Dm755 gj-regex "$pkgdir/usr/bin/gj-regex"
+
+    install -Dm644 packaging/common/gojail.conf "$pkgdir/etc/gojail/gojail.conf"
+    install -Dm644 packaging/common/jail.apk.local "$pkgdir/etc/gojail/jail.local"
+    cp -r config/filter.d "$pkgdir/etc/gojail/"
+    cp -r config/action.d "$pkgdir/etc/gojail/"
+    install -Dm755 packaging/apk/gojail.initd "$pkgdir/etc/init.d/gojail"
+}

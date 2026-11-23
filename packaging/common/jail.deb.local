@@ -1,0 +1,19 @@
+[DEFAULT]
+ignoreip = 127.0.0.1/8 ::1
+maxretry = 5
+findtime = 10m
+bantime = 10m
+backend = polling
+usedns = warn
+banaction = nftables
+action_ = %(banaction)s[name=%(__name__)s]
+action = %(action_)s
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 5
+findtime = 10m
+bantime = 10m

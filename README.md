@@ -244,6 +244,23 @@ Deployment notes:
 6. The sample iptables action only handles IPv4; use an `ip6tables` variant for IPv6.
 7. Prefer rename+create for log rotation; copytruncate has an edge case when the new content is longer than the old offset.
 
+### Packages
+
+Local Debian and Alpine packages can be built from the repository:
+
+```bash
+make deb       # dist/gojail_<version>_<arch>.deb
+make apk       # dist/gojail-<version>-r0.apk
+make packages  # both
+```
+
+Both packages declare an explicit dependency on `nftables` and an explicit conflict with `fail2ban`.
+
+- Debian/Ubuntu: systemd unit, dedicated `gojail` user, `CAP_NET_ADMIN`, default SSH log `/var/log/auth.log`.
+- Alpine: OpenRC service, default SSH log `/var/log/messages`, runs as root because nftables needs privileged access.
+
+See [docs/packaging.md](docs/packaging.md) for build, install, signing and uninstall details.
+
 ## fail2ban Compatibility
 
 | Capability | Status |
@@ -320,6 +337,7 @@ Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action t
 ## Documentation
 
 - [Configuration reference](docs/configuration.md)
+- [Packaging and installation](docs/packaging.md)
 - [Bundled filter catalog](docs/filters.md)
 - [Upstream fail2ban source review](docs/upstream-review.md)
 - [fail2ban feature analysis and gojail mapping](docs/fail2ban-analysis.md)

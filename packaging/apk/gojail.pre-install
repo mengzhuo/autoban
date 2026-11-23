@@ -1,0 +1,4 @@
+#!/bin/sh
+addgroup -S gojail 2>/dev/null || true
+adduser -S -D -H -s /sbin/nologin -G gojail gojail 2>/dev/null || true
+exit 0

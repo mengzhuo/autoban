@@ -1,0 +1,14 @@
+Package: gojail
+Version: @VERSION@
+Section: net
+Priority: optional
+Architecture: @ARCH@
+Maintainer: Meng Zhuo <mengzhuo@iscas.ac.cn>
+Homepage: https://github.com/mengzhuo/gojail
+Depends: nftables
+Conflicts: fail2ban
+Description: Go implementation of fail2ban with nftables
+ gojail monitors log files, counts failures and bans hosts using nftables.
+ It provides fail2ban-style filter.d/action.d configuration, a control CLI
+ and a systemd service. The package conflicts with fail2ban and requires
+ nftables for packet filtering.

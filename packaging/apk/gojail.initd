@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+name="gojail"
+description="gojail intrusion prevention daemon"
+command="/usr/bin/gojail"
+command_args="-config /etc/gojail"
+command_background="yes"
+pidfile="/run/gojail/gojail.pid"
+
+depend() {
+    need net
+    after firewall
+}
+
+start_pre() {
+    checkpath -d -m 0755 /run/gojail
+    checkpath -d -m 0755 /var/lib/gojail
+    checkpath -d -m 0755 /var/log/gojail
+}
