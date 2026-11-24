@@ -1,6 +1,6 @@
 [Unit]
-Description=gojail intrusion prevention daemon
-Documentation=https://github.com/mengzhuo/gojail
+Description=autoban intrusion prevention daemon
+Documentation=https://github.com/mengzhuo/autoban
 After=network-online.target
 Wants=network-online.target
 
@@ -8,27 +8,27 @@ Wants=network-online.target
 Type=simple
 
 # Run as an unprivileged, dedicated service user. Create it with
-# contrib/gojail.sysusers or `useradd --system --user-group gojail`.
-User=gojail
-Group=gojail
+# contrib/autoban.sysusers or `useradd --system --user-group autoban`.
+User=autoban
+Group=autoban
 # Debian/Ubuntu: /var/log/auth.log is readable by the adm group.
 # Remove this line if your log files use different group/ACL permissions.
 SupplementaryGroups=adm
 
-ExecStart=/usr/local/bin/gojail -config /etc/gojail
+ExecStart=/usr/local/bin/autoban -config /etc/autoban
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=2
 
-# systemd creates and owns these directories for User=gojail. They match the
+# systemd creates and owns these directories for User=autoban. They match the
 # production paths in the configuration reference:
-#   /etc/gojail, /var/lib/gojail, /run/gojail, /var/log/gojail
-ConfigurationDirectory=gojail
-StateDirectory=gojail
+#   /etc/autoban, /var/lib/autoban, /run/autoban, /var/log/autoban
+ConfigurationDirectory=autoban
+StateDirectory=autoban
 StateDirectoryMode=0750
-RuntimeDirectory=gojail
+RuntimeDirectory=autoban
 RuntimeDirectoryMode=0750
-LogsDirectory=gojail
+LogsDirectory=autoban
 LogsDirectoryMode=0750
 
 # Firewall actions (iptables/nftables) need CAP_NET_ADMIN only. Ambient

@@ -40,7 +40,7 @@ func Setup(level, target string) (*slog.Logger, func(), error) {
 	case "STDOUT":
 		w = os.Stdout
 	case "SYSLOG":
-		sw, err := syslog.New(syslog.LOG_DAEMON|syslog.LOG_INFO, "gojail")
+		sw, err := syslog.New(syslog.LOG_DAEMON|syslog.LOG_INFO, "autoban")
 		if err != nil {
 			return nil, nil, fmt.Errorf("open syslog: %w", err)
 		}
@@ -59,7 +59,7 @@ func Setup(level, target string) (*slog.Logger, func(), error) {
 		closers = append(closers, f)
 	}
 	handler := slog.NewTextHandler(w, &slog.HandlerOptions{Level: ParseLevel(level)})
-	logger := slog.New(handler).With("component", "gojail")
+	logger := slog.New(handler).With("component", "autoban")
 	slog.SetDefault(logger)
 	cleanup := func() {
 		for _, c := range closers {

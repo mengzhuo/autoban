@@ -42,6 +42,54 @@ type fileState struct {
 	offset int64
 }
 
+// FilePosition is one file's read position at snapshot time.
+type FilePosition struct {
+	Info   os.FileInfo
+	Offset int64
+}
+
+// Snapshot captures the read positions of a backend. It is used to keep
+// following the same files across a configuration reload.
+type Snapshot struct {
+	Files       map[string]FilePosition
+	EverStarted bool
+}
+
+// Snapshot returns a copy of the current file positions. It is safe to call
+// while the backend is running.
+func (b *FileBackend) Snapshot() Snapshot {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	s := Snapshot{
+		Files:       make(map[string]FilePosition, len(b.files)),
+		EverStarted: b.everStarted,
+	}
+	for path, st := range b.files {
+		s.Files[path] = FilePosition{Info: st.info, Offset: st.offset}
+	}
+	return s
+}
+
+// Restore installs a snapshot before Start. It must not be called on a started
+// backend.
+func (b *FileBackend) Restore(s Snapshot) error {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	if b.started {
+		return fmt.Errorf("cannot restore a running file backend")
+	}
+	b.files = make(map[string]*fileState, len(s.Files))
+	b.lastFiles = b.lastFiles[:0]
+	for path, pos := range s.Files {
+		b.files[path] = &fileState{info: pos.Info, offset: pos.Offset}
+		b.lastFiles = append(b.lastFiles, path)
+	}
+	sort.Strings(b.lastFiles)
+	b.everStarted = s.EverStarted
+	b.initial = false
+	return nil
+}
+
 // NewFileBackend creates a polling backend. Patterns are file paths or globs.
 func NewFileBackend(patterns []string, interval time.Duration, handler func(string), onError func(error), logger *slog.Logger) *FileBackend {
 	if interval <= 0 {
@@ -207,7 +255,7 @@ func (b *FileBackend) scanFileLocked(path string) ([]string, error) {
 		// A file that appeared after startup (e.g. after rotation) is read
 		// from the beginning.
 		state.offset = 0
-	} else if !os.SameFile(state.info, info) || info.Size() < state.offset {
+	} else if state.info == nil || !os.SameFile(state.info, info) || info.Size() < state.offset {
 		// Rotated or truncated.
 		state.offset = 0
 	}

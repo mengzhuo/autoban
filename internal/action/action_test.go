@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/config"
+	"github.com/mengzhuo/autoban/internal/config"
 )
 
 func testLogger() *slog.Logger {

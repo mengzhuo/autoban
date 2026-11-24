@@ -19,16 +19,17 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/action"
-	"github.com/mengzhuo/gojail/internal/api"
-	"github.com/mengzhuo/gojail/internal/ban"
-	"github.com/mengzhuo/gojail/internal/config"
-	"github.com/mengzhuo/gojail/internal/filter"
-	"github.com/mengzhuo/gojail/internal/jail"
-	"github.com/mengzhuo/gojail/internal/store"
+	"github.com/mengzhuo/autoban/internal/action"
+	"github.com/mengzhuo/autoban/internal/api"
+	"github.com/mengzhuo/autoban/internal/backend"
+	"github.com/mengzhuo/autoban/internal/ban"
+	"github.com/mengzhuo/autoban/internal/config"
+	"github.com/mengzhuo/autoban/internal/filter"
+	"github.com/mengzhuo/autoban/internal/jail"
+	"github.com/mengzhuo/autoban/internal/store"
 )
 
-// Version is the gojail release version.
+// Version is the autoban release version.
 const Version = "0.1.0"
 
 // Engine is the daemon.
@@ -272,7 +273,7 @@ func (e *Engine) Start() error {
 	}
 	e.save()
 	e.startSaveLoop()
-	e.log.Info("gojail started", "version", Version, "socket", e.global.Socket, "jails", len(started))
+	e.log.Info("autoban started", "version", Version, "socket", e.global.Socket, "jails", len(started))
 	return nil
 }
 
@@ -348,9 +349,18 @@ func (e *Engine) Reload() error {
 		cancel()
 	}
 	now := time.Now()
+	oldTrackers := make(map[string]ban.Snapshot, len(oldJails))
+	oldBackends := make(map[string]backend.Snapshot, len(oldJails))
+	for name, j := range oldJails {
+		oldTrackers[name] = j.Tracker().Snapshot(now)
+		oldBackends[name] = j.BackendSnapshot()
+	}
 	for name, j := range newJails {
-		if old, ok := oldJails[name]; ok {
-			j.Tracker().Restore(old.Tracker().Snapshot(now))
+		if _, ok := oldJails[name]; ok {
+			j.Tracker().Restore(oldTrackers[name])
+			if err := j.RestoreBackend(oldBackends[name]); err != nil {
+				e.log.Error("restore log position during reload", "jail", name, "error", err)
+			}
 		} else if snap, ok := e.initial.Jails[name]; ok {
 			j.Tracker().Restore(snap)
 		}
@@ -486,7 +496,7 @@ func (e *Engine) listenUnix() (net.Listener, error) {
 		}
 		if conn, derr := net.DialTimeout("unix", path, 300*time.Millisecond); derr == nil {
 			_ = conn.Close()
-			return nil, fmt.Errorf("another gojail instance is listening on %s", path)
+			return nil, fmt.Errorf("another autoban instance is listening on %s", path)
 		} else if errors.Is(derr, syscall.EACCES) || errors.Is(derr, syscall.EPERM) {
 			return nil, fmt.Errorf("socket %s exists but cannot be accessed: %w", path, derr)
 		}
@@ -777,7 +787,7 @@ func (e *Engine) save() {
 	}
 }
 
-// LoadGlobalForCLI is a convenience wrapper used by gj.
+// LoadGlobalForCLI is a convenience wrapper used by autoban-ctl.
 func LoadGlobalForCLI(dirs []string) (*config.Global, error) {
 	return config.LoadGlobal(dirs)
 }

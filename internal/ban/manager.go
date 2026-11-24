@@ -26,7 +26,7 @@ type Options struct {
 	BanTimeMax       time.Duration
 	BanTimeRnd       time.Duration
 	DBPurgeAge       time.Duration
-	MaxLines         int
+	MaxLines         int // log lines kept per ban ticket; <=0 uses the internal cap
 	Now              func() time.Time
 }
 
@@ -263,16 +263,27 @@ func (t *Tracker) AddFailure(host string, at time.Time, line string) AddResult {
 		return AddResult{Counted: true, Count: len(e.failures)}
 	}
 
-	matches := make([]string, 0, len(e.failures))
-	for _, f := range e.failures {
-		matches = append(matches, f.Line)
-	}
-	if len(matches) > 100 {
-		matches = matches[len(matches)-100:]
-	}
+	matches := t.matchesLocked(e.failures)
 	delete(t.entries, ip)
 	b := t.createBanLocked(ip, now, len(e.failures), matches)
 	return AddResult{Counted: true, Count: len(e.failures), Ban: b}
+}
+
+// matchesLocked returns the log lines attached to a new ban. maxlines limits
+// the ticket history; when it is unset, keep the historical hard cap.
+func (t *Tracker) matchesLocked(failures []Failure) []string {
+	limit := t.opts.MaxLines
+	if limit <= 0 {
+		limit = 100
+	}
+	if len(failures) > limit {
+		failures = failures[len(failures)-limit:]
+	}
+	matches := make([]string, len(failures))
+	for i, f := range failures {
+		matches[i] = f.Line
+	}
+	return matches
 }
 
 // BanIP creates a manual ban. It returns a nil Ban if the host was already
@@ -530,6 +541,17 @@ func (t *Tracker) SetMaxRetry(n int) error {
 	}
 	t.mu.Lock()
 	t.opts.MaxRetry = n
+	t.mu.Unlock()
+	return nil
+}
+
+// SetMaxLines updates the number of log lines kept per ban ticket.
+func (t *Tracker) SetMaxLines(n int) error {
+	if n < 1 {
+		return fmt.Errorf("maxlines must be >= 1")
+	}
+	t.mu.Lock()
+	t.opts.MaxLines = n
 	t.mu.Unlock()
 	return nil
 }

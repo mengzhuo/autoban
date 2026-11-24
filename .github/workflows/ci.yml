@@ -68,9 +68,9 @@ jobs:
         run: make build
       - name: Verify binaries
         run: |
-          ./bin/gojail -version
-          ./bin/gj -version
-          ./bin/gj-regex -h >/dev/null
+          ./bin/autoban -version
+          ./bin/autoban-ctl -version
+          ./bin/autoban-regex -h >/dev/null
 
   test:
     name: Test

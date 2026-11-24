@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+name="autoban"
+description="autoban intrusion prevention daemon"
+command="/usr/bin/autoban"
+command_args="-config /etc/autoban"
+command_background="yes"
+pidfile="/run/autoban/autoban.pid"
+
+depend() {
+    need net
+    after firewall
+}
+
+start_pre() {
+    checkpath -d -m 0755 /run/autoban
+    checkpath -d -m 0755 /var/lib/autoban
+    checkpath -d -m 0755 /var/log/autoban
+}

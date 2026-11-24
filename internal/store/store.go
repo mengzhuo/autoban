@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/ban"
+	"github.com/mengzhuo/autoban/internal/ban"
 )
 
 const formatVersion = 1

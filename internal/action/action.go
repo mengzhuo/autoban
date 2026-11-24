@@ -18,7 +18,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/config"
+	"github.com/mengzhuo/autoban/internal/config"
 )
 
 var tagRE = regexp.MustCompile(`<([A-Za-z0-9_.-]+)>`)

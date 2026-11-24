@@ -1,5 +1,5 @@
-// Package api defines the JSON protocol spoken over the gojail unix
-// socket and a small client used by gj.
+// Package api defines the JSON protocol spoken over the autoban unix
+// socket and a small client used by autoban-ctl.
 package api
 
 import (

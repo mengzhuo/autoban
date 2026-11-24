@@ -5,7 +5,7 @@ if command -v systemd-sysusers >/dev/null 2>&1; then
 fi
 if command -v systemctl >/dev/null 2>&1; then
     systemctl daemon-reload || true
-    systemctl enable gojail.service >/dev/null 2>&1 || true
-    systemctl restart gojail.service || true
+    systemctl enable autoban.service >/dev/null 2>&1 || true
+    systemctl restart autoban.service || true
 fi
 exit 0

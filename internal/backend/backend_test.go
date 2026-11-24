@@ -35,6 +35,56 @@ func recv(t *testing.T, ch <-chan string, timeout time.Duration) string {
 	}
 }
 
+func TestFileBackendSnapshotRestore(t *testing.T) {
+	dir := t.TempDir()
+	logPath := filepath.Join(dir, "app.log")
+	if err := os.WriteFile(logPath, []byte("old\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	lines := make(chan string, 10)
+	newBackend := func() *FileBackend {
+		return NewFileBackend([]string{logPath}, 100*time.Millisecond, func(s string) {
+			lines <- s
+		}, nil, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	}
+
+	first := newBackend()
+	firstCtx, firstCancel := context.WithCancel(context.Background())
+	defer firstCancel()
+	if err := first.Start(firstCtx); err != nil {
+		t.Fatal(err)
+	}
+	appendFile(t, logPath, "one\n")
+	if got := recv(t, lines, 2*time.Second); got != "one" {
+		t.Fatalf("got %q", got)
+	}
+	first.Stop()
+	snap := first.Snapshot()
+
+	// This line is written while no backend is running. A restored backend
+	// must resume from the old offset and process it.
+	appendFile(t, logPath, "two\n")
+	second := newBackend()
+	if err := second.Restore(snap); err != nil {
+		t.Fatal(err)
+	}
+	secondCtx, secondCancel := context.WithCancel(context.Background())
+	defer secondCancel()
+	if err := second.Start(secondCtx); err != nil {
+		t.Fatal(err)
+	}
+	defer second.Stop()
+
+	if got := recv(t, lines, 2*time.Second); got != "two" {
+		t.Fatalf("got %q, want resumed line", got)
+	}
+	select {
+	case line := <-lines:
+		t.Fatalf("line was replayed: %q", line)
+	case <-time.After(250 * time.Millisecond):
+	}
+}
+
 func TestFileBackendFollowRotateTruncate(t *testing.T) {
 	dir := t.TempDir()
 	logPath := filepath.Join(dir, "app.log")

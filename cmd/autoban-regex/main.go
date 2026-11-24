@@ -1,4 +1,4 @@
-// gj-regex is an offline filter tester, modelled after fail2ban-regex.
+// autoban-regex is an offline filter tester, modelled after fail2ban-regex.
 package main
 
 import (
@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/config"
-	"github.com/mengzhuo/gojail/internal/filter"
+	"github.com/mengzhuo/autoban/internal/config"
+	"github.com/mengzhuo/autoban/internal/filter"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 		verbose    = flag.Bool("v", false, "print every matched line")
 	)
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: gj-regex [options] <logfile|-> <filter|failregex>\n")
+		fmt.Fprintf(os.Stderr, "Usage: autoban-regex [options] <logfile|-> <filter|failregex>\n")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -142,6 +142,6 @@ func looksLikeRegex(s string) bool {
 }
 
 func fatal(err error) {
-	fmt.Fprintf(os.Stderr, "gj-regex: %v\n", err)
+	fmt.Fprintf(os.Stderr, "autoban-regex: %v\n", err)
 	os.Exit(1)
 }

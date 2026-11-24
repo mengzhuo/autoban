@@ -10,22 +10,22 @@ banaction = dummy
 enabled = true
 port = ssh
 filter = sshd
-logpath = /tmp/gojail-demo/auth.log
+logpath = /tmp/autoban-demo/auth.log
 maxretry = 3
 findtime = 10m
 bantime = 1h
 bantime.increment = true
 bantime.factor = 2
 bantime.maxtime = 1d
-action = dummy[name=%(__name__)s, logpath=/tmp/gojail/actions.log]
+action = dummy[name=%(__name__)s, logpath=/tmp/autoban/actions.log]
 
 # Example of a second, complete but disabled jail. It can be started with
-# `gj start nginx-http-auth` after its log file exists.
+# `autoban-ctl start nginx-http-auth` after its log file exists.
 [nginx-http-auth]
 enabled = false
 filter = nginx-http-auth
-logpath = /tmp/gojail-demo/nginx-error.log
+logpath = /tmp/autoban-demo/nginx-error.log
 maxretry = 5
 findtime = 10m
 bantime = 1h
-action = dummy[name=%(__name__)s, logpath=/tmp/gojail/actions.log]
+action = dummy[name=%(__name__)s, logpath=/tmp/autoban/actions.log]

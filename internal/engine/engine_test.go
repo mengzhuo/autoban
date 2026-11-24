@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/api"
-	"github.com/mengzhuo/gojail/internal/config"
-	"github.com/mengzhuo/gojail/internal/engine"
+	"github.com/mengzhuo/autoban/internal/api"
+	"github.com/mengzhuo/autoban/internal/config"
+	"github.com/mengzhuo/autoban/internal/engine"
 )
 
 func writeFile(t *testing.T, path, content string) {
@@ -31,7 +31,7 @@ func writeConfig(t *testing.T, dir string, bantime string) (authLog, actionLog s
 	if err := os.WriteFile(authLog, nil, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	writeFile(t, filepath.Join(dir, "gojail.conf"), `[Definition]
+	writeFile(t, filepath.Join(dir, "autoban.conf"), `[Definition]
 socket = `+filepath.Join(dir, "f2b.sock")+`
 pidfile = `+filepath.Join(dir, "f2b.pid")+`
 dbfile = `+filepath.Join(dir, "f2b.db")+`
@@ -166,6 +166,94 @@ func TestEngineBanAndExpire(t *testing.T) {
 	if _, err := os.Stat(g.Socket); !os.IsNotExist(err) {
 		t.Fatalf("socket still exists: %v", err)
 	}
+}
+
+func TestEngineMaxLinesLimitsBanMatches(t *testing.T) {
+	dir := t.TempDir()
+	authLog, _ := writeConfig(t, dir, "1h")
+	appendLines(t, filepath.Join(dir, "jail.local"), "maxretry = 3", "maxlines = 2")
+	e, client, _ := startEngine(t, dir)
+	defer e.Stop()
+
+	appendLines(t, authLog,
+		"BAD 198.51.100.1",
+		"BAD 198.51.100.1",
+		"BAD 198.51.100.1",
+	)
+	var st api.JailStatus
+	waitFor(t, 5*time.Second, "ban with maxlines", func() bool {
+		st = api.JailStatus{}
+		return client.Do(api.Request{Cmd: "status", Jail: "demo"}, &st) == nil && st.CurrentlyBanned == 1
+	})
+	if len(st.Banned) != 1 {
+		t.Fatalf("banned = %#v", st.Banned)
+	}
+	if got := len(st.Banned[0].Matches); got != 2 {
+		t.Fatalf("matches = %#v, want 2 lines", st.Banned[0].Matches)
+	}
+	if st.Banned[0].Failures != 3 {
+		t.Fatalf("failures = %d, want 3", st.Banned[0].Failures)
+	}
+
+	if err := client.Do(api.Request{Cmd: "jail.set", Jail: "demo", Args: []string{"maxlines", "1"}}, nil); err != nil {
+		t.Fatal(err)
+	}
+	var value api.Value
+	if err := client.Do(api.Request{Cmd: "jail.get", Jail: "demo", Args: []string{"maxlines"}}, &value); err != nil {
+		t.Fatal(err)
+	}
+	if value.Value != "1" {
+		t.Fatalf("maxlines = %q, want 1", value.Value)
+	}
+}
+
+func TestEngineReloadPreservesLogPosition(t *testing.T) {
+	dir := t.TempDir()
+	authLog, actionLog := writeConfig(t, dir, "1h")
+	// Slow actionstop creates a deterministic window between the old jail
+	// stopping and the new one starting.
+	writeFile(t, filepath.Join(dir, "action.d", "dummy.conf"), `[Definition]
+actionstart = true
+actionstop = printf '%s\n' "stop" >> "<logpath>"; sleep 1
+actioncheck =
+actionban = true
+actionunban = true
+
+[Init]
+name = default
+logpath = /dev/null
+`)
+	e, client, _ := startEngine(t, dir)
+	defer e.Stop()
+
+	appendLines(t, authLog, "BAD 203.0.113.50")
+	waitFor(t, 5*time.Second, "initial failure", func() bool {
+		var st api.JailStatus
+		return client.Do(api.Request{Cmd: "status", Jail: "demo"}, &st) == nil && st.TotalFailed == 1
+	})
+
+	done := make(chan error, 1)
+	go func() { done <- client.Do(api.Request{Cmd: "reload"}, nil) }()
+	waitFor(t, 5*time.Second, "old jail stop", func() bool {
+		return fileContains(t, actionLog, "stop")
+	})
+	// This line is written after the old backend stopped but before the new
+	// backend starts. It must not be skipped.
+	appendLines(t, authLog, "BAD 203.0.113.50")
+
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(10 * time.Second):
+		t.Fatal("reload did not finish")
+	}
+
+	waitFor(t, 5*time.Second, "failure written during reload", func() bool {
+		var st api.JailStatus
+		return client.Do(api.Request{Cmd: "status", Jail: "demo"}, &st) == nil && st.TotalFailed >= 2
+	})
 }
 
 func TestEnginePersistenceAndManualUnban(t *testing.T) {

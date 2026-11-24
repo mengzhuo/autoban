@@ -1,4 +1,4 @@
-# fail2ban 功能分析与 gojail 实现映射
+# fail2ban 功能分析与 autoban 实现映射
 
 ## 1. fail2ban 是什么
 
@@ -214,7 +214,7 @@ fail2ban 的 `fail2ban-client` 通过 Unix socket 与 server 通信，支持：
 - `reload`
 - `stop`
 
-Go 实现：`internal/api` + `cmd/gj`，使用换行分隔的 JSON 请求/响应，而不是 fail2ban 的旧文本协议。命令语义保持接近。
+Go 实现：`internal/api` + `cmd/autoban-ctl`，使用换行分隔的 JSON 请求/响应，而不是 fail2ban 的旧文本协议。命令语义保持接近。
 
 ### 5.7 日志、信号与运维
 
@@ -224,7 +224,7 @@ Go 实现：`internal/api` + `cmd/gj`，使用换行分隔的 JSON 请求/响应
 - pidfile 加锁防止重复启动。
 - systemd 托管是推荐部署方式。
 
-Go 实现：`internal/logging`、`internal/engine`、`cmd/gojail`。
+Go 实现：`internal/logging`、`internal/engine`、`cmd/autoban`。
 
 ## 6. 关键算法
 
@@ -293,8 +293,8 @@ params（Init + action ref 覆盖）
 | 服务端 | `internal/engine/engine.go` | 生命周期、socket、热重载 |
 | 持久化 | `internal/store/store.go` | JSON 快照 |
 | 控制协议 | `internal/api/api.go` | JSON request/response |
-| CLI | `cmd/gj` | 人类可读输出 |
-| 正则测试 | `cmd/gj-regex` | 离线匹配统计 |
+| CLI | `cmd/autoban-ctl` | 人类可读输出 |
+| 正则测试 | `cmd/autoban-regex` | 离线匹配统计 |
 
 ## 8. 设计差异与取舍
 

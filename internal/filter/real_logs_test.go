@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/config"
-	"github.com/mengzhuo/gojail/internal/filter"
+	"github.com/mengzhuo/autoban/internal/config"
+	"github.com/mengzhuo/autoban/internal/filter"
 )
 
 func loadFixtureFilter(t *testing.T, name string, ignore []string) *filter.Filter {

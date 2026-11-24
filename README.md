@@ -1,4 +1,4 @@
-# gojail
+# autoban
 
 **English** | [简体中文](README_zh.md)
 
@@ -7,12 +7,12 @@
 ![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
-[![GitHub](https://img.shields.io/badge/GitHub-mengzhuo%2Fgojail-181717?logo=github)](https://github.com/mengzhuo/gojail)
-[![CI](https://github.com/mengzhuo/gojail/actions/workflows/ci.yml/badge.svg)](https://github.com/mengzhuo/gojail/actions/workflows/ci.yml)
+[![GitHub](https://img.shields.io/badge/GitHub-mengzhuo%2Fautoban-181717?logo=github)](https://github.com/mengzhuo/autoban)
+[![CI](https://github.com/mengzhuo/autoban/actions/workflows/ci.yml/badge.svg)](https://github.com/mengzhuo/autoban/actions/workflows/ci.yml)
 
-gojail watches SSH, nginx, Apache and other logs, matches failed logins, scans and authentication errors with `failregex`, counts failures per host within `findtime`, and runs `actionban` once `maxretry` is reached. Bans are removed automatically with `actionunban` when `bantime` expires.
+autoban watches SSH, nginx, Apache and other logs, matches failed logins, scans and authentication errors with `failregex`, counts failures per host within `findtime`, and runs `actionban` once `maxretry` is reached. Bans are removed automatically with `actionunban` when `bantime` expires.
 
-The configuration format and `filter.d` / `action.d` semantics stay close to fail2ban, so existing jails, filters and action scripts can be migrated with minimal changes. gojail depends only on the Go standard library. It is intended both as a lightweight intrusion-prevention service and as a readable implementation for learning how fail2ban works.
+The configuration format and `filter.d` / `action.d` semantics stay close to fail2ban, so existing jails, filters and action scripts can be migrated with minimal changes. autoban depends only on the Go standard library. It is intended both as a lightweight intrusion-prevention service and as a readable implementation for learning how fail2ban works.
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@ The configuration format and `filter.d` / `action.d` semantics stay close to fai
 
 ## Features
 
-- **fail2ban-style configuration**: `gojail.conf` / `jail.conf` / `.local`, with `[DEFAULT]` inheritance, `%(option)s` interpolation, `[INCLUDES] before/after` and multi-line values.
+- **fail2ban-style configuration**: `autoban.conf` / `jail.conf` / `.local`, with `[DEFAULT]` inheritance, `%(option)s` interpolation, `[INCLUDES] before/after` and multi-line values.
 - **Filter engine**: `failregex`, `ignoreregex` and `prefregex`, with `<HOST>`, `<ADDR>`, `<SUBNET>`, `<USER>` and related placeholders.
 - **Filter modes and parameters**: `filter = name[mode=aggressive]`, recursive `<mode>` / `<mdre-<mode>>` tag expansion and per-filter option overrides.
 - **103 bundled filters**: SSH, web servers, web apps/panels, mail, FTP, VPN/VoIP, databases and infrastructure; see [docs/filters.md](docs/filters.md).
@@ -50,28 +50,28 @@ The configuration format and `filter.d` / `action.d` semantics stay close to fai
 Requirements: Go 1.22+ and Linux.
 
 ```bash
-git clone https://github.com/mengzhuo/gojail.git
-cd gojail
+git clone https://github.com/mengzhuo/autoban.git
+cd autoban
 make build
 ```
 
 If you only need the commands in `$GOBIN`:
 
 ```bash
-go install github.com/mengzhuo/gojail/cmd/gojail@latest
-go install github.com/mengzhuo/gojail/cmd/gj@latest
-go install github.com/mengzhuo/gojail/cmd/gj-regex@latest
+go install github.com/mengzhuo/autoban/cmd/autoban@latest
+go install github.com/mengzhuo/autoban/cmd/autoban-ctl@latest
+go install github.com/mengzhuo/autoban/cmd/autoban-regex@latest
 ```
 
 This produces three binaries:
 
 ```text
-bin/gojail       daemon
-bin/gj           control CLI
-bin/gj-regex     offline filter tester
+bin/autoban          daemon
+bin/autoban-ctl      control CLI
+bin/autoban-regex    offline filter tester
 ```
 
-Run the built-in demo. It uses the `dummy` action and `/tmp/gojail*` paths, so it does not touch the firewall:
+Run the built-in demo. It uses the `dummy` action and `/tmp/autoban*` paths, so it does not touch the firewall:
 
 ```bash
 make demo
@@ -80,87 +80,87 @@ make demo
 Manual run:
 
 ```bash
-mkdir -p /tmp/gojail-demo
-: > /tmp/gojail-demo/auth.log
+mkdir -p /tmp/autoban-demo
+: > /tmp/autoban-demo/auth.log
 
 # Terminal 1: start the daemon
-./bin/gojail -config ./config
+./bin/autoban -config ./config
 
 # Terminal 2: inspect status
-./bin/gj -config ./config status
-./bin/gj -config ./config status sshd
+./bin/autoban-ctl -config ./config status
+./bin/autoban-ctl -config ./config status sshd
 
 # Inject a failed login
 echo "$(date '+%b %e %H:%M:%S') demo sshd[1]: Failed password for root from 203.0.113.7 port 22 ssh2" \
-  >> /tmp/gojail-demo/auth.log
+  >> /tmp/autoban-demo/auth.log
 
 # Once maxretry is reached, inspect the ban list
-./bin/gj -config ./config banned sshd
+./bin/autoban-ctl -config ./config banned sshd
 ```
 
 ## Commands
 
 | Command | Purpose |
 |---|---|
-| `gojail` | Daemon; runs in the foreground, preferably under systemd |
-| `gj` | Control CLI; talks to the running daemon over a Unix socket |
-| `gj-regex` | Offline filter tester for log files and failregex patterns |
+| `autoban` | Daemon; runs in the foreground, preferably under systemd |
+| `autoban-ctl` | Control CLI; talks to the running daemon over a Unix socket |
+| `autoban-regex` | Offline filter tester for log files and failregex patterns |
 
 Common control commands:
 
 ```bash
-gj -config ./config status
-gj -config ./config status sshd
-gj -config ./config banned sshd
-gj -config ./config failures sshd
-gj -config ./config start sshd
-gj -config ./config stop sshd
-gj -config ./config restart sshd
-gj -config ./config banip sshd 203.0.113.9
-gj -config ./config unbanip sshd 203.0.113.9
-gj -config ./config flush sshd
-gj -config ./config get sshd bantime
-gj -config ./config set sshd maxretry 5
-gj -config ./config reload
-gj -config ./config stop          # stop the whole service when no jail is given
+autoban-ctl -config ./config status
+autoban-ctl -config ./config status sshd
+autoban-ctl -config ./config banned sshd
+autoban-ctl -config ./config failures sshd
+autoban-ctl -config ./config start sshd
+autoban-ctl -config ./config stop sshd
+autoban-ctl -config ./config restart sshd
+autoban-ctl -config ./config banip sshd 203.0.113.9
+autoban-ctl -config ./config unbanip sshd 203.0.113.9
+autoban-ctl -config ./config flush sshd
+autoban-ctl -config ./config get sshd bantime
+autoban-ctl -config ./config set sshd maxretry 5
+autoban-ctl -config ./config reload
+autoban-ctl -config ./config stop          # stop the whole service when no jail is given
 ```
 
 Test a filter offline:
 
 ```bash
-gj-regex -config ./config /var/log/auth.log sshd
-gj-regex -v -config ./config /var/log/auth.log sshd
-gj-regex /var/log/auth.log 'Failed password for .* from <HOST>'
+autoban-regex -config ./config /var/log/auth.log sshd
+autoban-regex -v -config ./config /var/log/auth.log sshd
+autoban-regex /var/log/auth.log 'Failed password for .* from <HOST>'
 ```
 
 ## Configuration
 
-The default config directory is `./config` when `config/gojail.conf` exists; otherwise `/etc/gojail` is used. Multiple directories can be specified explicitly:
+The default config directory is `./config` when `config/autoban.conf` exists; otherwise `/etc/autoban` is used. Multiple directories can be specified explicitly:
 
 ```bash
-gojail -config /etc/gojail
-gojail -config /etc/gojail,/etc/gojail-local
-gj -config /etc/gojail status
+autoban -config /etc/autoban
+autoban -config /etc/autoban,/etc/autoban-local
+autoban-ctl -config /etc/autoban status
 ```
 
 Load order (later files override earlier ones):
 
-1. `gojail.conf`
-2. `gojail.local`
+1. `autoban.conf`
+2. `autoban.local`
 3. `jail.conf`
 4. `jail.local`
 
-If neither `gojail.conf` nor `gojail.local` exists, `fail2ban.conf` / `fail2ban.local` are loaded as a fallback to ease migration. `filter.d/<name>.conf` and `.local`, as well as `action.d/<name>.conf` and `.local`, are merged in the same way.
+If neither `autoban.conf` nor `autoban.local` exists, `fail2ban.conf` / `fail2ban.local` are loaded as a fallback to ease migration. `filter.d/<name>.conf` and `.local`, as well as `action.d/<name>.conf` and `.local`, are merged in the same way.
 
 Minimal configuration:
 
 ```ini
-# gojail.conf
+# autoban.conf
 [Definition]
-socket = /run/gojail/gojail.sock
-pidfile = /run/gojail/gojail.pid
-dbfile = /var/lib/gojail/gojail.db
-logtarget = /var/log/gojail/gojail.log
+socket = /run/autoban/autoban.sock
+pidfile = /run/autoban/autoban.pid
+dbfile = /var/lib/autoban/autoban.db
+logtarget = /var/log/autoban/autoban.log
 loglevel = INFO
 ```
 
@@ -187,8 +187,8 @@ For the full global/jail option reference, filter placeholders and action tags, 
 ## Architecture
 
 ```text
-gojail (daemon)
-├── config loader        gojail.conf / jail.conf(.local)
+autoban (daemon)
+├── config loader        autoban.conf / jail.conf(.local)
 │   ├── filter.d         compile failregex, ignoreregex, datepattern
 │   └── action.d         load scripts, parameters and timeouts
 ├── polling backend      follow logpath, handle rotation/truncation/partial lines
@@ -196,10 +196,10 @@ gojail (daemon)
 ├── ban.Tracker          findtime window, maxretry, ban lifecycle
 ├── action               substitute <ip>/<matches>, execute shell scripts
 ├── store                JSON snapshot (bans/failures/ban history)
-└── control socket       JSON request/response used by gj
+└── control socket       JSON request/response used by autoban-ctl
 
-gj ── Unix socket ──> gojail
-gj-regex ── offline filter validation
+autoban-ctl ── Unix socket ──> autoban
+autoban-regex ── offline filter validation
 ```
 
 Data flow:
@@ -216,29 +216,29 @@ Data flow:
 
 ```bash
 # Install binaries
-sudo install -m 0755 bin/gojail bin/gj bin/gj-regex /usr/local/bin/
+sudo install -m 0755 bin/autoban bin/autoban-ctl bin/autoban-regex /usr/local/bin/
 
 # Install configuration (the demo config uses /tmp paths; adapt for production)
-sudo install -d /etc/gojail
-sudo cp config/gojail.conf config/jail.conf /etc/gojail/
-sudo cp -r config/filter.d config/action.d /etc/gojail/
+sudo install -d /etc/autoban
+sudo cp config/autoban.conf config/jail.conf /etc/autoban/
+sudo cp -r config/filter.d config/action.d /etc/autoban/
 
 # Create the service user/group and install the systemd unit
-sudo install -D -m 0644 contrib/gojail.sysusers /etc/sysusers.d/gojail.conf
+sudo install -D -m 0644 contrib/autoban.sysusers /etc/sysusers.d/autoban.conf
 sudo systemd-sysusers
-sudo install -m 0644 contrib/gojail.service /etc/systemd/system/gojail.service
+sudo install -m 0644 contrib/autoban.service /etc/systemd/system/autoban.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now gojail
+sudo systemctl enable --now autoban
 
 # Allow an admin account to use the control socket (socket mode 0660)
-sudo usermod -aG gojail "$USER"
+sudo usermod -aG autoban "$USER"
 ```
 
 Deployment notes:
 
-1. The unit runs gojail as the unprivileged `gojail` user. Firewall access is limited to `CAP_NET_ADMIN` through `AmbientCapabilities=` / `CapabilityBoundingSet=`; full root is not required.
-2. Ensure the `gojail` user can read the monitored logs. The unit grants the `adm` supplementary group for Debian/Ubuntu `auth.log`. On systems with root-only logs (for example `/var/log/secure`), add an ACL or adjust `SupplementaryGroups=`.
-3. Admin users must be members of the `gojail` group to use `gj` over the `0660` socket. Re-login after changing group membership.
+1. The unit runs autoban as the unprivileged `autoban` user. Firewall access is limited to `CAP_NET_ADMIN` through `AmbientCapabilities=` / `CapabilityBoundingSet=`; full root is not required.
+2. Ensure the `autoban` user can read the monitored logs. The unit grants the `adm` supplementary group for Debian/Ubuntu `auth.log`. On systems with root-only logs (for example `/var/log/secure`), add an ACL or adjust `SupplementaryGroups=`.
+3. Admin users must be members of the `autoban` group to use `autoban-ctl` over the `0660` socket. Re-login after changing group membership.
 4. The UFW action writes `/etc/ufw` and `/var/lib/ufw`. With `ProtectSystem=strict`, prefer iptables/nftables or add the required writable paths and permissions.
 5. Start with `banaction = dummy` to validate logs and regexes, then switch to `iptables-multiport`, `nftables` or `ufw`.
 6. The sample iptables action only handles IPv4; use an `ip6tables` variant for IPv6.
@@ -249,14 +249,14 @@ Deployment notes:
 Local Debian and Alpine packages can be built from the repository:
 
 ```bash
-make deb       # dist/gojail_<version>_<arch>.deb
-make apk       # dist/gojail-<version>-r0.apk
+make deb       # dist/autoban_<version>_<arch>.deb
+make apk       # dist/autoban-<version>-r0.apk
 make packages  # both
 ```
 
 Both packages declare an explicit dependency on `nftables` and an explicit conflict with `fail2ban`.
 
-- Debian/Ubuntu: systemd unit, dedicated `gojail` user, `CAP_NET_ADMIN`, default SSH log `/var/log/auth.log`.
+- Debian/Ubuntu: systemd unit, dedicated `autoban` user, `CAP_NET_ADMIN`, default SSH log `/var/log/auth.log`.
 - Alpine: OpenRC service, default SSH log `/var/log/messages`, runs as root because nftables needs privileged access.
 
 See [docs/packaging.md](docs/packaging.md) for build, install, signing and uninstall details.
@@ -265,7 +265,7 @@ See [docs/packaging.md](docs/packaging.md) for build, install, signing and unins
 
 | Capability | Status |
 |---|---|
-| `gojail.conf` / `jail.conf` / `.local` layering | ✅ |
+| `autoban.conf` / `jail.conf` / `.local` layering | ✅ |
 | `filter.d` failregex / ignoreregex / prefregex | ✅ |
 | `action.d` lifecycle, parameters, multiple actions | ✅ |
 | `ignoreip`, `usedns`, `ignorecommand` | ✅ |
@@ -274,10 +274,10 @@ See [docs/packaging.md](docs/packaging.md) for build, install, signing and unins
 | Python regex lookaround / backreferences | ❌ not supported by RE2 |
 | systemd journal backend | ❌ polling only |
 | SQLite database | ❌ JSON snapshot |
-| `fail2ban-client` protocol | ❌ gojail JSON protocol |
+| `fail2ban-client` protocol | ❌ autoban JSON protocol |
 | Full multi-line ticket aggregation | ⚠️ common prefregex markers only |
 
-gojail contains no fail2ban source code and is not wire-compatible with `fail2ban-client`. Configuration and core semantics intentionally follow fail2ban. See [docs/fail2ban-analysis.md](docs/fail2ban-analysis.md) for a detailed comparison.
+autoban contains no fail2ban source code and is not wire-compatible with `fail2ban-client`. Configuration and core semantics intentionally follow fail2ban. See [docs/fail2ban-analysis.md](docs/fail2ban-analysis.md) for a detailed comparison.
 
 ## Limitations
 
@@ -291,7 +291,7 @@ gojail contains no fail2ban source code and is not wire-compatible with `fail2ba
 ## Security
 
 - Action scripts run through `/bin/sh -c`. `<ip>` is validated as an IP or strict hostname, but `<matches>` comes from logs and is attacker-controlled. **Never interpolate `<matches>` / `<ipmatches>` into a shell script without quoting.**
-- The sample systemd unit runs gojail as an unprivileged user with only `CAP_NET_ADMIN`. If you start it manually as root, it does not drop privileges itself.
+- The sample systemd unit runs autoban as an unprivileged user with only `CAP_NET_ADMIN`. If you start it manually as root, it does not drop privileges itself.
 - Prefer a dedicated service user (or `DynamicUser=yes`). Avoid shared accounts such as `nobody`/`nouser`; they make socket, state and log ownership harder to manage.
 - `usedns = raw` passes hostnames directly to action scripts; prefer `usedns = no` or `warn`.
 - The JSON database contains ban history and log fragments and is created with mode `0600`; protect it as sensitive data.
@@ -313,23 +313,23 @@ GitHub Actions runs four independent jobs: `fmt`, `lint`, `build` and `test`; se
 Project layout:
 
 ```text
-cmd/gojail/       daemon
-cmd/gj/           control CLI
-cmd/gj-regex/     offline filter tester
-internal/config/  INI parsing, interpolation, includes, jail/filter/action loading
-internal/filter/  failregex compilation, <HOST> expansion, time parsing
-internal/ban/     failure counting, bans, increment, ignore list, snapshots
-internal/action/  action execution and tag substitution
-internal/backend/ file polling backend
-internal/jail/    jail runtime orchestration
-internal/engine/  configuration, socket, lifecycle, hot reload
-internal/store/   JSON persistence
-internal/api/     socket protocol and client types
-config/           demo configuration, filters and actions
-docs/             analysis and configuration reference
-contrib/          systemd unit and sysusers definition
-scripts/demo.sh   end-to-end demo
-.github/          GitHub Actions CI
+cmd/autoban/        daemon
+cmd/autoban-ctl/    control CLI
+cmd/autoban-regex/  offline filter tester
+internal/config/    INI parsing, interpolation, includes, jail/filter/action loading
+internal/filter/    failregex compilation, <HOST> expansion, time parsing
+internal/ban/       failure counting, bans, increment, ignore list, snapshots
+internal/action/    action execution and tag substitution
+internal/backend/   file polling backend
+internal/jail/      jail runtime orchestration
+internal/engine/    configuration, socket, lifecycle, hot reload
+internal/store/     JSON persistence
+internal/api/       socket protocol and client types
+config/             demo configuration, filters and actions
+docs/               analysis and configuration reference
+contrib/            systemd unit and sysusers definition
+scripts/demo.sh     end-to-end demo
+.github/            GitHub Actions CI
 ```
 
 Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action timeouts, log rotation, end-to-end banning, restart recovery and hot reload. The filter suite also includes sanitized real-world log fixtures for all bundled filters under `internal/filter/testdata/`; formats were cross-checked against fail2ban upstream `filter.d` and its test corpus.
@@ -340,16 +340,16 @@ Tests cover configuration parsing, IPv4/IPv6, date formats, ban policy, action t
 - [Packaging and installation](docs/packaging.md)
 - [Bundled filter catalog](docs/filters.md)
 - [Upstream fail2ban source review](docs/upstream-review.md)
-- [fail2ban feature analysis and gojail mapping](docs/fail2ban-analysis.md)
-- [systemd unit](contrib/gojail.service)
-- [sysusers definition](contrib/gojail.sysusers)
+- [fail2ban feature analysis and autoban mapping](docs/fail2ban-analysis.md)
+- [systemd unit](contrib/autoban.service)
+- [sysusers definition](contrib/autoban.sysusers)
 - [Demo script](scripts/demo.sh)
 
 The detailed documentation is currently written in Chinese. The English README above is the default project overview.
 
 ## Contributing
 
-Issues and pull requests are welcome at <https://github.com/mengzhuo/gojail>.
+Issues and pull requests are welcome at <https://github.com/mengzhuo/autoban>.
 
 ## License
 

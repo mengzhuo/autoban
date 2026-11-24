@@ -1,0 +1,5 @@
+# Install as /etc/sysusers.d/autoban.conf, then run `systemd-sysusers`.
+# The autoban group owns the control socket (mode 0660); add admin users to it:
+#   sudo usermod -aG autoban <admin-user>
+g autoban -
+u autoban -:autoban "autoban daemon" /nonexistent /usr/sbin/nologin

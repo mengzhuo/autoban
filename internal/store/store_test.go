@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/ban"
+	"github.com/mengzhuo/autoban/internal/ban"
 )
 
 func testLogger() *slog.Logger {

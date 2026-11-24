@@ -9,9 +9,9 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/api"
-	"github.com/mengzhuo/gojail/internal/config"
-	"github.com/mengzhuo/gojail/internal/engine"
+	"github.com/mengzhuo/autoban/internal/api"
+	"github.com/mengzhuo/autoban/internal/config"
+	"github.com/mengzhuo/autoban/internal/engine"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Printf("gj %s\n", engine.Version)
+		fmt.Printf("autoban-ctl %s\n", engine.Version)
 		return
 	}
 	args := flag.Args()
@@ -42,13 +42,13 @@ func main() {
 	client.Timeout = *timeout
 
 	if err := run(client, args, *jsonOut); err != nil {
-		fmt.Fprintf(os.Stderr, "gj: %v\n", err)
+		fmt.Fprintf(os.Stderr, "autoban-ctl: %v\n", err)
 		os.Exit(1)
 	}
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, `Usage: gj [options] <command> [args]
+	fmt.Fprintf(os.Stderr, `Usage: autoban-ctl [options] <command> [args]
 
 Commands:
   status [jail]              show server or jail status
@@ -84,7 +84,7 @@ func resolveSocket(configFlag string) string {
 	if g, err := config.LoadGlobal(dirs); err == nil && g.Socket != "" {
 		return g.Socket
 	}
-	return "/run/gojail/gojail.sock"
+	return "/run/autoban/autoban.sock"
 }
 
 func run(c *api.Client, args []string, jsonOut bool) error {
@@ -109,7 +109,7 @@ func run(c *api.Client, args []string, jsonOut bool) error {
 		if jsonOut {
 			return printJSON(out)
 		}
-		fmt.Printf("gojail %s\n", out.Value)
+		fmt.Printf("autoban %s\n", out.Value)
 		return nil
 	case "status":
 		if len(rest) > 0 {

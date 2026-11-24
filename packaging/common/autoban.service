@@ -1,25 +1,25 @@
 [Unit]
-Description=gojail intrusion prevention daemon
-Documentation=https://github.com/mengzhuo/gojail
+Description=autoban intrusion prevention daemon
+Documentation=https://github.com/mengzhuo/autoban
 After=network-online.target nftables.service
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=gojail
-Group=gojail
+User=autoban
+Group=autoban
 SupplementaryGroups=adm
-ExecStart=/usr/bin/gojail -config /etc/gojail
+ExecStart=/usr/bin/autoban -config /etc/autoban
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=2
 
-ConfigurationDirectory=gojail
-StateDirectory=gojail
+ConfigurationDirectory=autoban
+StateDirectory=autoban
 StateDirectoryMode=0750
-RuntimeDirectory=gojail
+RuntimeDirectory=autoban
 RuntimeDirectoryMode=0750
-LogsDirectory=gojail
+LogsDirectory=autoban
 LogsDirectoryMode=0750
 
 # nftables only needs CAP_NET_ADMIN; child nft processes inherit it.

@@ -25,7 +25,7 @@ tupleLine = (line[:dateStart], dateText, line[dateEnd:])
 ^\s*Logon\s+Login failed for user ...
 ```
 
-gojail 当前保留完整日志行做匹配，所以需要显式加前缀：
+autoban 当前保留完整日志行做匹配，所以需要显式加前缀：
 
 ```regex
 ^(?:\d{4}-... )?\s*Logon\s+Login failed ...
@@ -64,7 +64,7 @@ gojail 当前保留完整日志行做匹配，所以需要显式加前缀：
 ## 覆盖范围
 
 - 上游当前约有 104 个 `filter.d`（其中 6 个是 include 片段）；本项目目前内置 103 个过滤器，除需要多行关联的 `slapd` 外，独立 filter 已覆盖。
-- 本次按上游测试语料核对了各 filter 的代表性日志；没有逐字复制上游正则，而是按 gojail 的单行匹配模型重写。
+- 本次按上游测试语料核对了各 filter 的代表性日志；没有逐字复制上游正则，而是按 autoban 的单行匹配模型重写。
 - `filter = name[mode=...]` 参数和 `<mdre-<mode>>` 递归标签展开已实现；`freeswitch` 支持 normal/ddos/extra/aggressive。其他上游 filter 的 mode 分支尚未全部移植。
 - `fail2ban-regex` 上游测试语料中的部分场景依赖多行 ticket（尤其旧版 MongoDB）或 Python 正则 lookaround；这些场景未纳入当前单行 RE2 实现。
 - 除 `slapd` 的多行连接关联外，上游独立 filter 已全部移植；`slapd` 需要将同一 `conn=` 的 ACCEPT 与后续 RESULT err=49 关联，当前单行模型不适用。
@@ -95,4 +95,4 @@ zimbra-auth
 
 ## 许可说明
 
-fail2ban 是 GPLv2 项目。本项目只阅读其源码与测试日志，用于理解真实日志格式和匹配语义；没有复制其源码、配置或测试文件。仓库中的日志 fixture 是重新编写的脱敏样本，正则也是针对 gojail 的单行匹配模型独立实现。
+fail2ban 是 GPLv2 项目。本项目只阅读其源码与测试日志，用于理解真实日志格式和匹配语义；没有复制其源码、配置或测试文件。仓库中的日志 fixture 是重新编写的脱敏样本，正则也是针对 autoban 的单行匹配模型独立实现。

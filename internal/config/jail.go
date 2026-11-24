@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// Global holds settings from gojail.conf/local that affect the daemon.
+// Global holds settings from autoban.conf/local that affect the daemon.
 type Global struct {
 	LogLevel     string
 	LogTarget    string
@@ -89,37 +89,37 @@ const (
 	defaultMaxRetry  = 5
 	defaultFindTime  = 10 * time.Minute
 	defaultBantime   = 10 * time.Minute
-	defaultSocket    = "/run/gojail/gojail.sock"
-	defaultPIDFile   = "/run/gojail/gojail.pid"
-	defaultDBFile    = "/var/lib/gojail/gojail.db"
+	defaultSocket    = "/run/autoban/autoban.sock"
+	defaultPIDFile   = "/run/autoban/autoban.pid"
+	defaultDBFile    = "/var/lib/autoban/autoban.db"
 	defaultLogTarget = "STDERR"
 )
 
 // DefaultConfigDirs returns the conventional configuration locations.
-// gojail.conf is preferred; fail2ban.conf is accepted as a legacy fallback
+// autoban.conf is preferred; fail2ban.conf is accepted as a legacy fallback
 // so an existing fail2ban-style tree can be reused during migration.
 func DefaultConfigDirs() []string {
-	for _, file := range []string{"config/gojail.conf", "config/fail2ban.conf"} {
+	for _, file := range []string{"config/autoban.conf", "config/fail2ban.conf"} {
 		if _, err := os.Stat(file); err == nil {
 			return []string{"config"}
 		}
 	}
-	for _, dir := range []string{"/etc/gojail"} {
+	for _, dir := range []string{"/etc/autoban"} {
 		if _, err := os.Stat(dir); err == nil {
 			return []string{dir}
 		}
 	}
-	return []string{"/etc/gojail"}
+	return []string{"/etc/autoban"}
 }
 
-// LoadGlobal loads gojail.conf and gojail.local from all config dirs. If no
-// gojail config exists, fail2ban.conf/fail2ban.local are loaded as a legacy
+// LoadGlobal loads autoban.conf and autoban.local from all config dirs. If no
+// autoban config exists, fail2ban.conf/fail2ban.local are loaded as a legacy
 // fallback.
 func LoadGlobal(dirs []string) (*Global, error) {
 	c := New()
 	found := false
 	for _, dir := range dirs {
-		for _, name := range []string{"gojail.conf", "gojail.local"} {
+		for _, name := range []string{"autoban.conf", "autoban.local"} {
 			ok, err := c.LoadOptional(filepath.Join(dir, name))
 			if err != nil {
 				return nil, err

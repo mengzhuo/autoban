@@ -16,12 +16,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/mengzhuo/gojail/internal/action"
-	"github.com/mengzhuo/gojail/internal/api"
-	"github.com/mengzhuo/gojail/internal/backend"
-	"github.com/mengzhuo/gojail/internal/ban"
-	"github.com/mengzhuo/gojail/internal/config"
-	"github.com/mengzhuo/gojail/internal/filter"
+	"github.com/mengzhuo/autoban/internal/action"
+	"github.com/mengzhuo/autoban/internal/api"
+	"github.com/mengzhuo/autoban/internal/backend"
+	"github.com/mengzhuo/autoban/internal/ban"
+	"github.com/mengzhuo/autoban/internal/config"
+	"github.com/mengzhuo/autoban/internal/filter"
 )
 
 // Jail is the runtime form of one [jail] section.
@@ -41,7 +41,6 @@ type Jail struct {
 	done          chan struct{}
 	usedNS        string
 	ignoreCommand string
-	maxLines      int
 
 	actionMu     sync.Mutex
 	actionBans   atomic.Int64
@@ -73,7 +72,6 @@ func New(spec config.JailSpec, f *filter.Filter, tracker *ban.Tracker, actions [
 		onChange:      onChange,
 		usedNS:        spec.UsedNS,
 		ignoreCommand: spec.IgnoreCommand,
-		maxLines:      spec.MaxLines,
 		dnsCache:      make(map[string]dnsEntry),
 		dnsWarned:     make(map[string]bool),
 	}
@@ -474,7 +472,6 @@ func (j *Jail) Status() api.JailStatus {
 	j.mu.RLock()
 	started := j.started
 	usedns := j.usedNS
-	maxLines := j.maxLines
 	ignoreCommand := j.ignoreCommand
 	j.mu.RUnlock()
 
@@ -518,7 +515,7 @@ func (j *Jail) Status() api.JailStatus {
 		BanTimeFactor:    opts.BanTimeFactor,
 		BanTimeMax:       int64(opts.BanTimeMax / time.Second),
 		BanTimeRnd:       int64(opts.BanTimeRnd / time.Second),
-		MaxLines:         maxLines,
+		MaxLines:         opts.MaxLines,
 		IgnoreCommand:    ignoreCommand,
 		DatePattern:      j.spec.DatePattern,
 		FilterWarnings:   j.filter.Warnings(),
@@ -585,8 +582,10 @@ func (j *Jail) Set(key, value string) error {
 		if err != nil || n < 1 {
 			return fmt.Errorf("invalid maxlines %q", value)
 		}
+		if err := j.tracker.SetMaxLines(n); err != nil {
+			return err
+		}
 		j.mu.Lock()
-		j.maxLines = n
 		j.spec.MaxLines = n
 		j.mu.Unlock()
 		return nil
@@ -627,7 +626,6 @@ func (j *Jail) Get(key string) (string, error) {
 	opts := j.tracker.Options()
 	j.mu.RLock()
 	usedns := j.usedNS
-	maxLines := j.maxLines
 	ignoreCommand := j.ignoreCommand
 	j.mu.RUnlock()
 	switch strings.ToLower(strings.TrimSpace(key)) {
@@ -642,7 +640,7 @@ func (j *Jail) Get(key string) (string, error) {
 	case "usedns":
 		return usedns, nil
 	case "maxlines":
-		return strconv.Itoa(maxLines), nil
+		return strconv.Itoa(opts.MaxLines), nil
 	case "ignorecommand":
 		return ignoreCommand, nil
 	case "bantime.increment":
@@ -681,6 +679,22 @@ func (j *Jail) Spec() config.JailSpec {
 
 // Tracker returns the failure tracker (used for persistence).
 func (j *Jail) Tracker() *ban.Tracker { return j.tracker }
+
+// BackendSnapshot captures log file positions for a configuration reload.
+func (j *Jail) BackendSnapshot() backend.Snapshot {
+	if j.backend == nil {
+		return backend.Snapshot{}
+	}
+	return j.backend.Snapshot()
+}
+
+// RestoreBackend restores log file positions before the jail is started.
+func (j *Jail) RestoreBackend(s backend.Snapshot) error {
+	if j.backend == nil {
+		return nil
+	}
+	return j.backend.Restore(s)
+}
 
 // Filter returns the compiled filter.
 func (j *Jail) Filter() *filter.Filter { return j.filter }

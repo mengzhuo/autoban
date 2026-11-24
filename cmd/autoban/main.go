@@ -8,14 +8,14 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/mengzhuo/gojail/internal/config"
-	"github.com/mengzhuo/gojail/internal/engine"
-	"github.com/mengzhuo/gojail/internal/logging"
+	"github.com/mengzhuo/autoban/internal/config"
+	"github.com/mengzhuo/autoban/internal/engine"
+	"github.com/mengzhuo/autoban/internal/logging"
 )
 
 func main() {
 	var (
-		configFlag = flag.String("config", "", "comma-separated configuration directories (default: ./config or /etc/gojail)")
+		configFlag = flag.String("config", "", "comma-separated configuration directories (default: ./config or /etc/autoban)")
 		socket     = flag.String("socket", "", "override control socket path")
 		pidfile    = flag.String("pidfile", "", "override pidfile path")
 		dbfile     = flag.String("dbfile", "", "override database path (empty disables persistence)")
@@ -27,19 +27,19 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Printf("gojail %s\n", engine.Version)
+		fmt.Printf("autoban %s\n", engine.Version)
 		return
 	}
 	dirs := resolveConfigDirs(*configFlag)
 	for _, dir := range dirs {
 		if st, err := os.Stat(dir); err != nil || !st.IsDir() {
-			fmt.Fprintf(os.Stderr, "gojail: configuration directory %q is not accessible\n", dir)
+			fmt.Fprintf(os.Stderr, "autoban: configuration directory %q is not accessible\n", dir)
 			os.Exit(1)
 		}
 	}
 	global, err := config.LoadGlobal(dirs)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "gojail: %v\n", err)
+		fmt.Fprintf(os.Stderr, "autoban: %v\n", err)
 		os.Exit(1)
 	}
 	if *socket != "" {
@@ -60,7 +60,7 @@ func main() {
 
 	logger, cleanup, err := logging.Setup(global.LogLevel, global.LogTarget)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "gojail: logging setup failed: %v\n", err)
+		fmt.Fprintf(os.Stderr, "autoban: logging setup failed: %v\n", err)
 		os.Exit(1)
 	}
 	defer cleanup()

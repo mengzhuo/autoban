@@ -115,7 +115,7 @@ func TestLoadSampleConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(g.Socket, "gojail.sock") {
+	if !strings.Contains(g.Socket, "autoban.sock") {
 		t.Fatalf("socket = %q", g.Socket)
 	}
 	specs, err := LoadJails([]string{dir}, g.PollInterval)
@@ -154,7 +154,7 @@ func TestLoadSampleConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if as.Params["logpath"] != "/tmp/gojail/actions.log" {
+	if as.Params["logpath"] != "/tmp/autoban/actions.log" {
 		t.Fatalf("action params = %#v", as.Params)
 	}
 	if !strings.Contains(as.Ban, "<ip>") {

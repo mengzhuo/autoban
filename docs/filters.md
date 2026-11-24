@@ -1,4 +1,4 @@
-# gojail 内置过滤器
+# autoban 内置过滤器
 
 `config/filter.d/` 目前包含 103 个过滤器。所有过滤器都使用 RE2 兼容正则，并有对应的真实格式日志样本和测试，位于 `internal/filter/testdata/`。
 
@@ -136,7 +136,7 @@
 | `php-url-fopen` | PHP RFI access log |
 | `proxmox` | Proxmox VE 认证失败 |
 | `qmail` | qmail/rblsmtpd RBL 阻断 |
-| `recidive` | 重复封禁（兼容 fail2ban 与 gojail 日志） |
+| `recidive` | 重复封禁（兼容 fail2ban 与 autoban 日志） |
 | `routeros-auth` | MikroTik RouterOS 登录失败 |
 | `scanlogd` | scanlogd 扫描报告 |
 | `screensharingd` | macOS Screen Sharing 认证失败 |
@@ -157,7 +157,7 @@
 
 当前还差 1 个上游过滤器：
 
-- `slapd`：OpenLDAP 的失败日志需要把同一 `conn=...` 的 `ACCEPT from IP=...` 与后续 `RESULT ... err=49` 关联起来，属于多行 ticket；当前 gojail 的单行匹配模型无法安全实现，暂未启用。
+- `slapd`：OpenLDAP 的失败日志需要把同一 `conn=...` 的 `ACCEPT from IP=...` 与后续 `RESULT ... err=49` 关联起来，属于多行 ticket；当前 autoban 的单行匹配模型无法安全实现，暂未启用。
 - `apache-common`、`botsearch-common`、`common`、`exim-common`、`nginx-error-common`、`selinux-common` 是上游的 include 片段，不是独立 filter，本项目直接内联了所需规则。
 
 因此除 `slapd` 多行关联外，上游独立 filter 已全部覆盖。
@@ -215,7 +215,7 @@ log {
 测试过滤器：
 
 ```bash
-gj-regex -config ./config /var/log/mail.log postfix
-gj-regex -config ./config -mode ddos /var/log/freeswitch.log freeswitch
+autoban-regex -config ./config /var/log/mail.log postfix
+autoban-regex -config ./config -mode ddos /var/log/freeswitch.log freeswitch
 go test ./internal/filter -run 'TestReal|TestFreeswitchModes' -v
 ```

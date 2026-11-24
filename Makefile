@@ -8,9 +8,9 @@ all: build
 
 build:
 	mkdir -p $(BIN)
-	$(GO) build -trimpath -o $(BIN)/gojail ./cmd/gojail
-	$(GO) build -trimpath -o $(BIN)/gj ./cmd/gj
-	$(GO) build -trimpath -o $(BIN)/gj-regex ./cmd/gj-regex
+	$(GO) build -trimpath -o $(BIN)/autoban ./cmd/autoban
+	$(GO) build -trimpath -o $(BIN)/autoban-ctl ./cmd/autoban-ctl
+	$(GO) build -trimpath -o $(BIN)/autoban-regex ./cmd/autoban-regex
 
 test:
 	$(GO) test ./...

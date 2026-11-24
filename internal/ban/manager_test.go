@@ -62,6 +62,41 @@ func TestThresholdAndExpiry(t *testing.T) {
 	}
 }
 
+func TestMaxLinesInMatches(t *testing.T) {
+	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
+	tr := newTestTracker(t, &now, Options{MaxRetry: 4, MaxLines: 2})
+	for i, line := range []string{"first", "second", "third"} {
+		r := tr.AddFailure("203.0.113.5", now, line)
+		if r.Ban != nil {
+			t.Fatalf("ban on failure %d: %#v", i+1, r.Ban)
+		}
+	}
+	r := tr.AddFailure("203.0.113.5", now, "fourth")
+	if r.Ban == nil {
+		t.Fatal("expected ban")
+	}
+	if got := r.Ban.Matches; len(got) != 2 || got[0] != "third" || got[1] != "fourth" {
+		t.Fatalf("matches = %#v, want last two lines", got)
+	}
+	if r.Ban.Failures != 4 {
+		t.Fatalf("failures = %d, want 4", r.Ban.Failures)
+	}
+}
+
+func TestSetMaxLines(t *testing.T) {
+	now := time.Now()
+	tr := newTestTracker(t, &now, Options{MaxRetry: 2, MaxLines: 1})
+	if err := tr.SetMaxLines(3); err != nil {
+		t.Fatal(err)
+	}
+	if got := tr.Options().MaxLines; got != 3 {
+		t.Fatalf("maxlines = %d, want 3", got)
+	}
+	if err := tr.SetMaxLines(0); err == nil {
+		t.Fatal("expected invalid maxlines error")
+	}
+}
+
 func TestFindTimeWindowAndStale(t *testing.T) {
 	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
 	tr := newTestTracker(t, &now, Options{MaxRetry: 2})

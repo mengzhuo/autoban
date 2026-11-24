@@ -1,4 +1,0 @@
-#!/bin/sh
-rc-service gojail stop 2>/dev/null || true
-rc-update del gojail default 2>/dev/null || true
-exit 0

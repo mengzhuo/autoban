@@ -14,7 +14,7 @@ VERSION="${VERSION:-0.1.0}"
 PKGREL="${PKGREL:-0}"
 OUTDIR="${OUTDIR:-$ROOT/dist}"
 BUILDER_IMAGE="${BUILDER_IMAGE:-golang:1.26-alpine}"
-WORKDIR="$(mktemp -d "${TMPDIR:-/tmp}/gojail-apk.XXXXXX")"
+WORKDIR="$(mktemp -d "${TMPDIR:-/tmp}/autoban-apk.XXXXXX")"
 BUILD="$WORKDIR/build"
 OUT="$WORKDIR/out"
 
@@ -33,7 +33,7 @@ command -v tar >/dev/null 2>&1 || die "tar is required"
 command -v docker >/dev/null 2>&1 || die "docker is required (or run abuild manually from packaging/apk)"
 
 mkdir -p "$BUILD" "$OUT" "$OUTDIR"
-rm -f "$OUTDIR/gojail-${VERSION}-r${PKGREL}.apk"
+rm -f "$OUTDIR/autoban-${VERSION}-r${PKGREL}.apk"
 rm -rf "$OUTDIR/apk-keys"
 
 # Build the source archive from tracked and untracked-but-not-ignored files.
@@ -43,16 +43,16 @@ echo "==> creating source archive"
 (
     cd "$ROOT"
     git ls-files -z --cached --others --exclude-standard \
-        | tar --null -T - --transform "s#^#gojail-$VERSION/#" \
-              -czf "$BUILD/gojail-$VERSION.tar.gz"
+        | tar --null -T - --transform "s#^#autoban-$VERSION/#" \
+              -czf "$BUILD/autoban-$VERSION.tar.gz"
 )
 
-[ -s "$BUILD/gojail-$VERSION.tar.gz" ] || die "source archive is empty"
+[ -s "$BUILD/autoban-$VERSION.tar.gz" ] || die "source archive is empty"
 
 cp "$ROOT/packaging/apk/APKBUILD" "$BUILD/APKBUILD"
-cp "$ROOT"/packaging/apk/gojail.pre-install \
-   "$ROOT"/packaging/apk/gojail.post-install \
-   "$ROOT"/packaging/apk/gojail.pre-deinstall \
+cp "$ROOT"/packaging/apk/autoban.pre-install \
+   "$ROOT"/packaging/apk/autoban.post-install \
+   "$ROOT"/packaging/apk/autoban.pre-deinstall \
    "$BUILD/"
 
 # Keep the package version in sync with the requested build version.
@@ -63,13 +63,13 @@ sed -i \
 sed -i '/^sha512sums=/d' "$BUILD/APKBUILD"
 
 if command -v sha512sum >/dev/null 2>&1; then
-    SHA512="$(sha512sum "$BUILD/gojail-$VERSION.tar.gz" | awk '{print $1}')"
+    SHA512="$(sha512sum "$BUILD/autoban-$VERSION.tar.gz" | awk '{print $1}')"
 elif command -v shasum >/dev/null 2>&1; then
-    SHA512="$(shasum -a 512 "$BUILD/gojail-$VERSION.tar.gz" | awk '{print $1}')"
+    SHA512="$(shasum -a 512 "$BUILD/autoban-$VERSION.tar.gz" | awk '{print $1}')"
 else
     die "sha512sum or shasum is required"
 fi
-printf '\nsha512sums="%s  gojail-%s.tar.gz"\n' "$SHA512" "$VERSION" >> "$BUILD/APKBUILD"
+printf '\nsha512sums="%s  autoban-%s.tar.gz"\n' "$SHA512" "$VERSION" >> "$BUILD/APKBUILD"
 
 cat > "$WORKDIR/run-abuild.sh" <<'EOF'
 #!/bin/sh

@@ -1,24 +1,24 @@
-# gojail 配置参考
+# autoban 配置参考
 
 ## 1. 配置目录与加载顺序
 
 默认目录：
 
-- 当前工作目录下存在 `config/gojail.conf` 时使用 `./config`；
-- 否则使用 `/etc/gojail`。
+- 当前工作目录下存在 `config/autoban.conf` 时使用 `./config`；
+- 否则使用 `/etc/autoban`。
 
 也可以显式指定：
 
 ```bash
-gojail -config /etc/gojail
-gojail -config /etc/gojail,/etc/gojail-local
-gj -config /etc/gojail status
+autoban -config /etc/autoban
+autoban -config /etc/autoban,/etc/autoban-local
+autoban-ctl -config /etc/autoban status
 ```
 
-加载顺序（后加载覆盖先加载）；若一个 `gojail.conf`/`gojail.local` 都不存在，会回退读取 `fail2ban.conf`/`fail2ban.local`：
+加载顺序（后加载覆盖先加载）；若一个 `autoban.conf`/`autoban.local` 都不存在，会回退读取 `fail2ban.conf`/`fail2ban.local`：
 
-1. 每个目录的 `gojail.conf`
-2. 每个目录的 `gojail.local`
+1. 每个目录的 `autoban.conf`
+2. 每个目录的 `autoban.local`
 3. 每个目录的 `jail.conf`
 4. 每个目录的 `jail.local`
 
@@ -50,7 +50,7 @@ after = paths-local.conf
 
 路径相对当前配置文件所在目录，支持 glob。
 
-## 2. 全局选项（gojail.conf）
+## 2. 全局选项（autoban.conf）
 
 全局选项读取 `[Definition]`，不存在时回退到 `[DEFAULT]`。
 
@@ -58,10 +58,10 @@ after = paths-local.conf
 |---|---|---|
 | `loglevel` | `INFO` | `DEBUG` / `INFO` / `WARN` / `ERROR` |
 | `logtarget` | `STDERR` | `STDOUT`、`STDERR`、`SYSLOG` 或文件路径 |
-| `socket` | `/run/gojail/gojail.sock` | 控制 Unix socket |
+| `socket` | `/run/autoban/autoban.sock` | 控制 Unix socket |
 | `socketmode` | `0660` | socket 权限（八进制） |
-| `pidfile` | `/run/gojail/gojail.pid` | pidfile；加 flock 防止重复启动 |
-| `dbfile` | `/var/lib/gojail/gojail.db` | JSON 快照；空字符串关闭持久化 |
+| `pidfile` | `/run/autoban/autoban.pid` | pidfile；加 flock 防止重复启动 |
+| `dbfile` | `/var/lib/autoban/autoban.db` | JSON 快照；空字符串关闭持久化 |
 | `dbpurgeage` | `1d` | 封禁历史保留时间，用于 `bantime.increment` |
 | `pollinterval` | `1s` | 文件后端默认轮询间隔 |
 
@@ -70,11 +70,11 @@ after = paths-local.conf
 ```ini
 [Definition]
 loglevel = INFO
-logtarget = /var/log/gojail/gojail.log
-socket = /run/gojail/gojail.sock
+logtarget = /var/log/autoban/autoban.log
+socket = /run/autoban/autoban.sock
 socketmode = 0660
-pidfile = /run/gojail/gojail.pid
-dbfile = /var/lib/gojail/gojail.db
+pidfile = /run/autoban/autoban.pid
+dbfile = /var/lib/autoban/autoban.db
 dbpurgeage = 1d
 pollinterval = 1s
 ```
@@ -95,7 +95,7 @@ pollinterval = 1s
 | `ignoreip` | `127.0.0.1/8 ::1` | 忽略的 IP/CIDR/主机名，逗号或空白分隔 |
 | `usedns` | `warn` | `yes` / `no` / `warn` / `raw` |
 | `ignorecommand` | 无 | 对每个候选 IP 执行，退出码 0 表示忽略 |
-| `maxlines` | 继承 filter（默认 1） | 匹配行历史大小 |
+| `maxlines` | 继承 filter（默认 1） | 每个封禁票据保留的日志行数上限（用于 `<matches>`） |
 | `bantime.increment` | `false` | 是否按历史封禁次数递增 |
 | `bantime.factor` | `2` | 递增因子 |
 | `bantime.maxtime` | 无上限 | 递增后的最大 bantime |
@@ -145,7 +145,7 @@ filter 文件读取 `[Definition]`，可以用 `[Init]` 定义被 `%(...)s` 引�
 | `ignoreregex` | 命中则忽略该行 |
 | `prefregex` | 预匹配；可用 `<F-CONTENT>...</F-CONTENT>` 指定子片段 |
 | `datepattern` | 日志时间格式（strptime 子集） |
-| `maxlines` | 匹配行历史大小，默认 1 |
+| `maxlines` | 每个封禁票据保留的日志行数上限（用于 `<matches>`），默认 1 |
 | `mode` | 过滤器模式，如 `normal`、`aggressive`、`ddos`、`extra`；具体取决于 filter |
 | `usedns` | 过滤器级主机名策略（jail 可覆盖） |
 | `ignorecommand` | filter 级忽略命令（jail 可覆盖） |
@@ -273,7 +273,7 @@ actionunban = printf '%s\n' "unban <ip>" >> "<logpath>"
 
 [Init]
 name = default
-logpath = /tmp/gojail/actions.log
+logpath = /tmp/autoban/actions.log
 ```
 
 iptables：
@@ -304,7 +304,7 @@ iptables = iptables -w
 ## 6. CLI
 
 ```text
-gj [options] <command> [args]
+autoban-ctl [options] <command> [args]
 
 status [jail]              服务端或 jail 状态
 banned <jail>              当前封禁列表
@@ -326,10 +326,12 @@ version                    服务端版本
 
 `set usedns` 只改变运行时的解析策略；filter 是否编译主机名匹配取决于启动时的 `usedns`，需要 `reload` 才完全生效。
 
+`reload` 会保留各 jail 的日志读取位置：旧配置停止到新配置启动之间追加的日志会继续被处理，不会因为重新打开文件而丢失。
+
 `-json` 输出原始 JSON，便于脚本处理：
 
 ```bash
-gj -json -config ./config status sshd
+autoban-ctl -json -config ./config status sshd
 ```
 
 ## 7. 控制协议
@@ -399,7 +401,7 @@ Unix socket 使用换行分隔 JSON：
 - socket 权限限制为管理组；不要把 socket 暴露到不可信目录。
 - `usedns = raw` 会把主机名交给动作脚本，确认动作能安全处理。
 - 生产环境先使用 `dummy` 动作验证规则，再切换到真实防火墙动作。
-- 推荐使用 `contrib/gojail.service`：专用 `gojail` 用户 + `CAP_NET_ADMIN`，避免完整 root 权限。
+- 推荐使用 `contrib/autoban.service`：专用 `autoban` 用户 + `CAP_NET_ADMIN`，避免完整 root 权限。
 - 确保服务用户有日志读权限（Debian/Ubuntu 常用 `adm` 组；其他系统用 ACL）。
-- 控制 socket 属组为 `gojail`、模式 `0660`，管理员加入该组后使用 `gj`。
+- 控制 socket 属组为 `autoban`、模式 `0660`，管理员加入该组后使用 `autoban-ctl`。
 - 以 root 运行时，定期审计 `action.d` 和命令参数。
