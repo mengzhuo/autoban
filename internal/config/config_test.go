@@ -122,17 +122,24 @@ func TestLoadSampleConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(specs) != 4 {
+	if len(specs) != 5 {
 		t.Fatalf("got %d jails", len(specs))
 	}
 	var sshd *JailSpec
+	var wordpress *JailSpec
 	for i := range specs {
-		if specs[i].Name == "sshd" {
+		switch specs[i].Name {
+		case "sshd":
 			sshd = &specs[i]
+		case "wordpress":
+			wordpress = &specs[i]
 		}
 	}
 	if sshd == nil {
 		t.Fatal("sshd jail not found")
+	}
+	if wordpress == nil || wordpress.Enabled || wordpress.Filter != "wordpress" {
+		t.Fatalf("wordpress = %#v", wordpress)
 	}
 	if !sshd.Enabled || sshd.MaxRetry != 3 || sshd.BanTime != time.Hour {
 		t.Fatalf("sshd = %#v", sshd)
