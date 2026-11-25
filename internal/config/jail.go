@@ -32,28 +32,29 @@ type ActionRef struct {
 
 // JailSpec is a fully resolved jail configuration.
 type JailSpec struct {
-	Name             string
-	Enabled          bool
-	Filter           string
-	LogPaths         []string
-	Backend          string
-	MaxRetry         int
-	FindTime         time.Duration
-	BanTime          time.Duration
-	IgnoreIP         []string
-	UsedNS           string
-	UsedNSExplicit   bool
-	IgnoreCommand    string
-	FilterParams     map[string]string
-	FilterMode       string
-	MaxLines         int
-	BanTimeIncrement bool
-	BanTimeFactor    float64
-	BanTimeMax       time.Duration
-	BanTimeRnd       time.Duration
-	PollInterval     time.Duration
-	ActionRefs       []ActionRef
-	DatePattern      string
+	Name              string
+	Enabled           bool
+	Filter            string
+	LogPaths          []string
+	Backend           string
+	MaxRetry          int
+	FindTime          time.Duration
+	BanTime           time.Duration
+	IgnoreIP          []string
+	UsedNS            string
+	UsedNSExplicit    bool
+	IgnoreCommand     string
+	FilterParams      map[string]string
+	FilterMode        string
+	MaxLines          int
+	BanTimeIncrement  bool
+	BanTimeFactor     float64
+	BanTimeMultiplier time.Duration
+	BanTimeMax        time.Duration
+	BanTimeRnd        time.Duration
+	PollInterval      time.Duration
+	ActionRefs        []ActionRef
+	DatePattern       string
 }
 
 // FilterSpec is a resolved filter.d configuration.
@@ -359,6 +360,15 @@ func resolveJail(c *Config, name string, pollDefault time.Duration) (JailSpec, e
 			return spec, fmt.Errorf("invalid bantime.factor %q", v)
 		}
 		spec.BanTimeFactor = f
+	}
+	if v, ok, err := get("bantime.multiplier"); err != nil {
+		return spec, err
+	} else if ok && strings.TrimSpace(v) != "" {
+		d, err := ParseDuration(v)
+		if err != nil || d < 0 {
+			return spec, fmt.Errorf("invalid bantime.multiplier %q", v)
+		}
+		spec.BanTimeMultiplier = d
 	}
 	if v, ok, err := get("bantime.maxtime"); err != nil {
 		return spec, err

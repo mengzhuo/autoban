@@ -96,13 +96,25 @@ pollinterval = 1s
 | `usedns` | `warn` | `yes` / `no` / `warn` / `raw` |
 | `ignorecommand` | 无 | 对每个候选 IP 执行，退出码 0 表示忽略 |
 | `maxlines` | 继承 filter（默认 1） | 每个封禁票据保留的日志行数上限（用于 `<matches>`） |
-| `bantime.increment` | `false` | 是否按历史封禁次数递增 |
-| `bantime.factor` | `2` | 递增因子 |
+| `bantime.increment` | `false` | 是否按历史封禁次数指数递增 |
+| `bantime.factor` | `2` | 指数递增因子；仅在 `bantime.increment = true` 时生效 |
+| `bantime.multiplier` | `0` | 线性递增系数：`max(bancount * multiplier, bantime)`；大于 0 时优先于 `bantime.increment` |
 | `bantime.maxtime` | 无上限 | 递增后的最大 bantime |
 | `bantime.rndtime` | `0` | 随机抖动范围，例如 `5m` |
 | `pollinterval` | 全局值 | 该 jail 的轮询间隔 |
 | `datepattern` | 继承 filter | 覆盖 filter 的日期格式 |
 | `action` | 继承 `[DEFAULT]` | 一个或多个动作 |
+
+例如线性封禁时长：
+
+```ini
+bantime = 60
+bantime.multiplier = 10s
+```
+
+等价于 `bantime = max(bancount * 10s, 60s)`：前 6 次封禁都是 60 秒，第 7 次开始为 70 秒。
+
+`bantime.increment` 是 fail2ban 风格的指数递增：`bantime * factor^(bancount-1)`。只有 `bantime.increment = true` 时 `bantime.factor` 才会生效；如果同时配置了 `bantime.multiplier`，则使用线性公式。
 
 时间格式：
 
@@ -322,7 +334,7 @@ ping                       探活
 version                    服务端版本
 ```
 
-可修改的运行参数：`maxretry`、`findtime`、`bantime`、`ignoreip`、`usedns`、`maxlines`、`ignorecommand`、`bantime.increment`、`bantime.factor`、`bantime.maxtime`、`bantime.rndtime`。
+可修改的运行参数：`maxretry`、`findtime`、`bantime`、`ignoreip`、`usedns`、`maxlines`、`ignorecommand`、`bantime.increment`、`bantime.factor`、`bantime.multiplier`、`bantime.maxtime`、`bantime.rndtime`。
 
 `set usedns` 只改变运行时的解析策略；filter 是否编译主机名匹配取决于启动时的 `usedns`，需要 `reload` 才完全生效。
 

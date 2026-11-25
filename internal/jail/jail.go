@@ -492,33 +492,34 @@ func (j *Jail) Status() api.JailStatus {
 		ips[i] = b.IP
 	}
 	return api.JailStatus{
-		Name:             j.spec.Name,
-		Filter:           j.spec.Filter,
-		FilterMode:       j.spec.FilterMode,
-		Backend:          j.spec.Backend,
-		Files:            files,
-		Actions:          actionNames,
-		Started:          started,
-		CurrentlyFailed:  st.CurrentlyFailed,
-		TotalFailed:      st.TotalFailed,
-		CurrentlyBanned:  st.CurrentlyBanned,
-		TotalBanned:      st.TotalBanned,
-		TotalUnbanned:    st.TotalUnbanned,
-		BannedIPs:        ips,
-		Banned:           banned,
-		MaxRetry:         opts.MaxRetry,
-		FindTime:         int64(opts.FindTime / time.Second),
-		BanTime:          int64(opts.BanTime / time.Second),
-		UsedNS:           usedns,
-		IgnoreIP:         append([]string(nil), opts.IgnoreIP...),
-		BanTimeIncrement: opts.BanTimeIncrement,
-		BanTimeFactor:    opts.BanTimeFactor,
-		BanTimeMax:       int64(opts.BanTimeMax / time.Second),
-		BanTimeRnd:       int64(opts.BanTimeRnd / time.Second),
-		MaxLines:         opts.MaxLines,
-		IgnoreCommand:    ignoreCommand,
-		DatePattern:      j.spec.DatePattern,
-		FilterWarnings:   j.filter.Warnings(),
+		Name:              j.spec.Name,
+		Filter:            j.spec.Filter,
+		FilterMode:        j.spec.FilterMode,
+		Backend:           j.spec.Backend,
+		Files:             files,
+		Actions:           actionNames,
+		Started:           started,
+		CurrentlyFailed:   st.CurrentlyFailed,
+		TotalFailed:       st.TotalFailed,
+		CurrentlyBanned:   st.CurrentlyBanned,
+		TotalBanned:       st.TotalBanned,
+		TotalUnbanned:     st.TotalUnbanned,
+		BannedIPs:         ips,
+		Banned:            banned,
+		MaxRetry:          opts.MaxRetry,
+		FindTime:          int64(opts.FindTime / time.Second),
+		BanTime:           int64(opts.BanTime / time.Second),
+		UsedNS:            usedns,
+		IgnoreIP:          append([]string(nil), opts.IgnoreIP...),
+		BanTimeIncrement:  opts.BanTimeIncrement,
+		BanTimeFactor:     opts.BanTimeFactor,
+		BanTimeMultiplier: int64(opts.BanTimeMultiplier / time.Second),
+		BanTimeMax:        int64(opts.BanTimeMax / time.Second),
+		BanTimeRnd:        int64(opts.BanTimeRnd / time.Second),
+		MaxLines:          opts.MaxLines,
+		IgnoreCommand:     ignoreCommand,
+		DatePattern:       j.spec.DatePattern,
+		FilterWarnings:    j.filter.Warnings(),
 	}
 }
 
@@ -604,6 +605,12 @@ func (j *Jail) Set(key, value string) error {
 			return fmt.Errorf("invalid bantime.factor %q", value)
 		}
 		return j.tracker.SetBanTimeFactor(f)
+	case "bantime.multiplier":
+		d, err := config.ParseDuration(value)
+		if err != nil {
+			return err
+		}
+		return j.tracker.SetBanTimeMultiplier(d)
 	case "bantime.maxtime":
 		d, err := config.ParseDuration(value)
 		if err != nil {
@@ -647,6 +654,8 @@ func (j *Jail) Get(key string) (string, error) {
 		return strconv.FormatBool(opts.BanTimeIncrement), nil
 	case "bantime.factor":
 		return strconv.FormatFloat(opts.BanTimeFactor, 'f', -1, 64), nil
+	case "bantime.multiplier":
+		return strconv.FormatInt(int64(opts.BanTimeMultiplier/time.Second), 10), nil
 	case "bantime.maxtime":
 		return strconv.FormatInt(int64(opts.BanTimeMax/time.Second), 10), nil
 	case "bantime.rndtime":

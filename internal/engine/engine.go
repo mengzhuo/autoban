@@ -172,6 +172,9 @@ func (e *Engine) buildJail(spec config.JailSpec, snapshot *ban.Snapshot) (*jail.
 		usedns = "warn"
 	}
 	spec.UsedNS = usedns
+	if spec.BanTimeMultiplier > 0 && spec.BanTimeIncrement {
+		e.log.Warn("bantime.multiplier overrides bantime.increment", "jail", spec.Name)
+	}
 
 	f, err := filter.Compile(filter.Options{
 		Name:        spec.Filter,
@@ -199,17 +202,18 @@ func (e *Engine) buildJail(spec config.JailSpec, snapshot *ban.Snapshot) (*jail.
 	}
 
 	tracker, err := ban.New(ban.Options{
-		MaxRetry:         spec.MaxRetry,
-		FindTime:         spec.FindTime,
-		BanTime:          spec.BanTime,
-		IgnoreIP:         spec.IgnoreIP,
-		BanTimeIncrement: spec.BanTimeIncrement,
-		BanTimeFactor:    spec.BanTimeFactor,
-		BanTimeMax:       spec.BanTimeMax,
-		BanTimeRnd:       spec.BanTimeRnd,
-		DBPurgeAge:       e.global.DBPurgeAge,
-		MaxLines:         spec.MaxLines,
-		Now:              time.Now,
+		MaxRetry:          spec.MaxRetry,
+		FindTime:          spec.FindTime,
+		BanTime:           spec.BanTime,
+		IgnoreIP:          spec.IgnoreIP,
+		BanTimeIncrement:  spec.BanTimeIncrement,
+		BanTimeFactor:     spec.BanTimeFactor,
+		BanTimeMultiplier: spec.BanTimeMultiplier,
+		BanTimeMax:        spec.BanTimeMax,
+		BanTimeRnd:        spec.BanTimeRnd,
+		DBPurgeAge:        e.global.DBPurgeAge,
+		MaxLines:          spec.MaxLines,
+		Now:               time.Now,
 	})
 	if err != nil {
 		return nil, err

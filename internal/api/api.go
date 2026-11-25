@@ -56,33 +56,34 @@ type FailureInfo struct {
 
 // JailStatus is the detailed status of one jail.
 type JailStatus struct {
-	Name             string    `json:"name"`
-	Filter           string    `json:"filter"`
-	FilterMode       string    `json:"filterMode,omitempty"`
-	Backend          string    `json:"backend"`
-	Files            []string  `json:"files"`
-	Actions          []string  `json:"actions"`
-	Started          bool      `json:"started"`
-	CurrentlyFailed  int       `json:"currentlyFailed"`
-	TotalFailed      int64     `json:"totalFailed"`
-	CurrentlyBanned  int       `json:"currentlyBanned"`
-	TotalBanned      int64     `json:"totalBanned"`
-	TotalUnbanned    int64     `json:"totalUnbanned"`
-	BannedIPs        []string  `json:"bannedIPs"`
-	Banned           []BanInfo `json:"banned"`
-	MaxRetry         int       `json:"maxRetry"`
-	FindTime         int64     `json:"findTime"`
-	BanTime          int64     `json:"banTime"`
-	UsedNS           string    `json:"usedns"`
-	IgnoreIP         []string  `json:"ignoreip"`
-	BanTimeIncrement bool      `json:"banTimeIncrement"`
-	BanTimeFactor    float64   `json:"banTimeFactor"`
-	BanTimeMax       int64     `json:"banTimeMax"`
-	BanTimeRnd       int64     `json:"banTimeRnd"`
-	MaxLines         int       `json:"maxLines"`
-	IgnoreCommand    string    `json:"ignoreCommand,omitempty"`
-	DatePattern      string    `json:"datePattern,omitempty"`
-	FilterWarnings   []string  `json:"filterWarnings,omitempty"`
+	Name              string    `json:"name"`
+	Filter            string    `json:"filter"`
+	FilterMode        string    `json:"filterMode,omitempty"`
+	Backend           string    `json:"backend"`
+	Files             []string  `json:"files"`
+	Actions           []string  `json:"actions"`
+	Started           bool      `json:"started"`
+	CurrentlyFailed   int       `json:"currentlyFailed"`
+	TotalFailed       int64     `json:"totalFailed"`
+	CurrentlyBanned   int       `json:"currentlyBanned"`
+	TotalBanned       int64     `json:"totalBanned"`
+	TotalUnbanned     int64     `json:"totalUnbanned"`
+	BannedIPs         []string  `json:"bannedIPs"`
+	Banned            []BanInfo `json:"banned"`
+	MaxRetry          int       `json:"maxRetry"`
+	FindTime          int64     `json:"findTime"`
+	BanTime           int64     `json:"banTime"`
+	UsedNS            string    `json:"usedns"`
+	IgnoreIP          []string  `json:"ignoreip"`
+	BanTimeIncrement  bool      `json:"banTimeIncrement"`
+	BanTimeFactor     float64   `json:"banTimeFactor"`
+	BanTimeMultiplier int64     `json:"banTimeMultiplier"`
+	BanTimeMax        int64     `json:"banTimeMax"`
+	BanTimeRnd        int64     `json:"banTimeRnd"`
+	MaxLines          int       `json:"maxLines"`
+	IgnoreCommand     string    `json:"ignoreCommand,omitempty"`
+	DatePattern       string    `json:"datePattern,omitempty"`
+	FilterWarnings    []string  `json:"filterWarnings,omitempty"`
 }
 
 // Value is a generic single-string result.

@@ -37,7 +37,7 @@ The configuration format and `filter.d` / `action.d` semantics stay close to fai
 - **Filter modes and parameters**: `filter = name[mode=aggressive]`, recursive `<mode>` / `<mdre-<mode>>` tag expansion and per-filter option overrides.
 - **104 bundled filters**: SSH, web servers, web apps/panels, mail, FTP, VPN/VoIP, databases and infrastructure; see [docs/filters.md](docs/filters.md).
 - **Log timestamp detection**: built-in syslog, ISO-8601, nginx, Apache and epoch formats, plus custom `datepattern` support.
-- **Full ban lifecycle**: `maxretry`, `findtime`, `bantime`, permanent bans, `ignoreip`, `ignorecommand` and `bantime.increment`.
+- **Full ban lifecycle**: `maxretry`, `findtime`, `bantime`, permanent bans, `ignoreip`, `ignorecommand`, `bantime.increment` and `bantime.multiplier`.
 - **Action system**: `actioncheck/start/stop/ban/unban/flush`, multiple actions per jail, tag substitution, execution timeouts and process-group cleanup.
 - **File backend**: logpath globs, rotation, truncation, partial lines and new-file detection.
 - **Persistence**: bans, failure counters and ban history are stored in an atomic JSON snapshot; state is restored on restart and active rules are re-applied.
@@ -269,7 +269,7 @@ See [docs/packaging.md](docs/packaging.md) for build, install, signing and unins
 | `filter.d` failregex / ignoreregex / prefregex | ✅ |
 | `action.d` lifecycle, parameters, multiple actions | ✅ |
 | `ignoreip`, `usedns`, `ignorecommand` | ✅ |
-| `bantime.increment/factor/maxtime/rndtime` | ✅ |
+| `bantime.increment/factor/multiplier/maxtime/rndtime` | ✅ |
 | File rotation/truncation tracking | ✅ |
 | Python regex lookaround / backreferences | ❌ not supported by RE2 |
 | systemd journal backend | ❌ polling only |

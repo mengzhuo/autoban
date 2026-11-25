@@ -37,7 +37,7 @@ autoban 持续读取 SSH、nginx、Apache 等日志，用 `failregex` 识别失�
 - **Filter mode 与参数**：`filter = name[mode=aggressive]`，支持 `<mode>` / `<mdre-<mode>>` 递归标签展开和 filter 参数覆盖。
 - **104 个内置过滤器**：SSH、Web 服务器、Web 应用/面板、邮件、FTP、VPN/VoIP、数据库和基础设施；见 [docs/filters.md](docs/filters.md)。
 - **日志时间识别**：内置 syslog、ISO-8601、nginx、Apache、epoch 格式，支持 `datepattern` 自定义。
-- **完整封禁生命周期**：`maxretry`、`findtime`、`bantime`、永久封禁、`ignoreip`、`ignorecommand`、`bantime.increment`。
+- **完整封禁生命周期**：`maxretry`、`findtime`、`bantime`、永久封禁、`ignoreip`、`ignorecommand`、`bantime.increment`、`bantime.multiplier`。
 - **动作系统**：`actioncheck/start/stop/ban/unban/flush`，多动作链，占位符替换，执行超时和进程组清理。
 - **文件后端**：logpath glob、轮转、截断、半行、新文件检测。
 - **状态持久化**：封禁、失败计数、封禁历史写入 JSON 快照；重启恢复，并重新应用未过期规则。
@@ -269,7 +269,7 @@ make packages  # 同时构建
 | `filter.d` failregex / ignoreregex / prefregex | ✅ |
 | `action.d` 生命周期、参数、多动作 | ✅ |
 | `ignoreip`、`usedns`、`ignorecommand` | ✅ |
-| `bantime.increment/factor/maxtime/rndtime` | ✅ |
+| `bantime.increment/factor/multiplier/maxtime/rndtime` | ✅ |
 | 文件轮转/截断跟随 | ✅ |
 | Python 正则 lookaround / 反向引用 | ❌ RE2 不支持 |
 | systemd journal 后端 | ❌ 仅文件轮询 |

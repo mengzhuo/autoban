@@ -142,6 +142,7 @@ Go 实现：`internal/filter`。将 fail2ban 占位符展开为 RE2 兼容正则
 - 当前封禁集合、到期时间。
 - `bantime`：`-1` 表示永久。
 - `bantime.increment = true` 时按 `factor^(n-1)` 递增，`bantime.maxtime` 封顶，`bantime.rndtime` 加入随机抖动。
+- autoban 额外支持 `bantime.multiplier` 线性模式：`max(bancount * multiplier, bantime)`；设置后优先于指数模式。
 - 封禁历史用于计算第 n 次封禁；按 `dbpurgeage` 清理。
 - 解封、flush、重启恢复。
 

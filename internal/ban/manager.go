@@ -17,17 +17,18 @@ import (
 
 // Options controls a Tracker.
 type Options struct {
-	MaxRetry         int
-	FindTime         time.Duration
-	BanTime          time.Duration // negative means permanent
-	IgnoreIP         []string
-	BanTimeIncrement bool
-	BanTimeFactor    float64
-	BanTimeMax       time.Duration
-	BanTimeRnd       time.Duration
-	DBPurgeAge       time.Duration
-	MaxLines         int // log lines kept per ban ticket; <=0 uses the internal cap
-	Now              func() time.Time
+	MaxRetry          int
+	FindTime          time.Duration
+	BanTime           time.Duration // negative means permanent
+	IgnoreIP          []string
+	BanTimeIncrement  bool
+	BanTimeFactor     float64
+	BanTimeMultiplier time.Duration
+	BanTimeMax        time.Duration
+	BanTimeRnd        time.Duration
+	DBPurgeAge        time.Duration
+	MaxLines          int // log lines kept per ban ticket; <=0 uses the internal cap
+	Now               func() time.Time
 }
 
 // Failure is one matched log line associated with a host.
@@ -116,6 +117,9 @@ func New(opts Options) (*Tracker, error) {
 	}
 	if opts.BanTimeFactor <= 0 {
 		opts.BanTimeFactor = 2
+	}
+	if opts.BanTimeMultiplier < 0 {
+		return nil, fmt.Errorf("bantime.multiplier must not be negative")
 	}
 	if opts.Now == nil {
 		opts.Now = time.Now
@@ -286,6 +290,24 @@ func (t *Tracker) matchesLocked(failures []Failure) []string {
 	return matches
 }
 
+// banCountDuration returns max(count * multiplier, minimum).
+func banCountDuration(count int, multiplier, minimum time.Duration) time.Duration {
+	if count < 1 {
+		count = 1
+	}
+	if multiplier <= 0 {
+		return minimum
+	}
+	if int64(count) > math.MaxInt64/int64(multiplier) {
+		return time.Duration(math.MaxInt64)
+	}
+	d := time.Duration(int64(count) * int64(multiplier))
+	if d < minimum {
+		return minimum
+	}
+	return d
+}
+
 // BanIP creates a manual ban. It returns a nil Ban if the host was already
 // banned.
 func (t *Tracker) BanIP(host string) (*Ban, error) {
@@ -319,20 +341,27 @@ func (t *Tracker) createBanLocked(ip string, now time.Time, failures int, matche
 
 	duration := t.opts.BanTime
 	permanent := duration < 0
-	if !permanent && t.opts.BanTimeIncrement && len(history) > 1 {
-		factor := t.opts.BanTimeFactor
-		if factor <= 0 {
-			factor = 2
-		}
-		mult := math.Pow(factor, float64(len(history)-1))
-		scaled := float64(duration) * mult
-		if scaled >= float64(math.MaxInt64) {
-			duration = time.Duration(math.MaxInt64)
-		} else {
-			duration = time.Duration(scaled)
-		}
-		if t.opts.BanTimeMax > 0 && duration > t.opts.BanTimeMax {
-			duration = t.opts.BanTimeMax
+	if !permanent {
+		if t.opts.BanTimeMultiplier > 0 {
+			duration = banCountDuration(len(history), t.opts.BanTimeMultiplier, t.opts.BanTime)
+			if t.opts.BanTimeMax > 0 && duration > t.opts.BanTimeMax {
+				duration = t.opts.BanTimeMax
+			}
+		} else if t.opts.BanTimeIncrement && len(history) > 1 {
+			factor := t.opts.BanTimeFactor
+			if factor <= 0 {
+				factor = 2
+			}
+			mult := math.Pow(factor, float64(len(history)-1))
+			scaled := float64(duration) * mult
+			if scaled >= float64(math.MaxInt64) {
+				duration = time.Duration(math.MaxInt64)
+			} else {
+				duration = time.Duration(scaled)
+			}
+			if t.opts.BanTimeMax > 0 && duration > t.opts.BanTimeMax {
+				duration = t.opts.BanTimeMax
+			}
 		}
 	}
 	if !permanent && t.opts.BanTimeRnd > 0 {
@@ -603,6 +632,17 @@ func (t *Tracker) SetBanTimeFactor(f float64) error {
 	}
 	t.mu.Lock()
 	t.opts.BanTimeFactor = f
+	t.mu.Unlock()
+	return nil
+}
+
+// SetBanTimeMultiplier updates bantime.multiplier.
+func (t *Tracker) SetBanTimeMultiplier(d time.Duration) error {
+	if d < 0 {
+		return fmt.Errorf("bantime.multiplier must not be negative")
+	}
+	t.mu.Lock()
+	t.opts.BanTimeMultiplier = d
 	t.mu.Unlock()
 	return nil
 }

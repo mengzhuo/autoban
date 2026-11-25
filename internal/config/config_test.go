@@ -109,6 +109,27 @@ func TestParseActionRefs(t *testing.T) {
 	}
 }
 
+func TestBanTimeMultiplier(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "jail.local")
+	if err := os.WriteFile(path, []byte(`[DEFAULT]
+bantime = 60s
+bantime.multiplier = 10s
+
+[demo]
+enabled = false
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	specs, err := LoadJails([]string{dir}, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(specs) != 1 || specs[0].BanTime != 60*time.Second || specs[0].BanTimeMultiplier != 10*time.Second {
+		t.Fatalf("specs = %#v", specs)
+	}
+}
+
 func TestLoadSampleConfig(t *testing.T) {
 	dir := filepath.Join("..", "..", "config")
 	g, err := LoadGlobal([]string{dir})

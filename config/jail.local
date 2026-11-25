@@ -16,6 +16,8 @@ findtime = 10m
 bantime = 1h
 bantime.increment = true
 bantime.factor = 2
+# Linear alternative: max(bancount * multiplier, bantime)
+# bantime.multiplier = 10s
 bantime.maxtime = 1d
 action = dummy[name=%(__name__)s, logpath=/tmp/autoban/actions.log]
 

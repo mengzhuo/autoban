@@ -256,6 +256,31 @@ logpath = /dev/null
 	})
 }
 
+func TestEngineBanTimeMultiplierOption(t *testing.T) {
+	dir := t.TempDir()
+	writeConfig(t, dir, "1h")
+	e, client, _ := startEngine(t, dir)
+	defer e.Stop()
+
+	if err := client.Do(api.Request{Cmd: "jail.set", Jail: "demo", Args: []string{"bantime.multiplier", "10s"}}, nil); err != nil {
+		t.Fatal(err)
+	}
+	var value api.Value
+	if err := client.Do(api.Request{Cmd: "jail.get", Jail: "demo", Args: []string{"bantime.multiplier"}}, &value); err != nil {
+		t.Fatal(err)
+	}
+	if value.Value != "10" {
+		t.Fatalf("bantime.multiplier = %q, want 10", value.Value)
+	}
+	var st api.JailStatus
+	if err := client.Do(api.Request{Cmd: "status", Jail: "demo"}, &st); err != nil {
+		t.Fatal(err)
+	}
+	if st.BanTimeMultiplier != 10 {
+		t.Fatalf("status multiplier = %d, want 10", st.BanTimeMultiplier)
+	}
+}
+
 func TestEnginePersistenceAndManualUnban(t *testing.T) {
 	dir := t.TempDir()
 	authLog, actionLog := writeConfig(t, dir, "1h")

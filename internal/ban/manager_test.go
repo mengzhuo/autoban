@@ -95,6 +95,74 @@ func TestSetMaxLines(t *testing.T) {
 	if err := tr.SetMaxLines(0); err == nil {
 		t.Fatal("expected invalid maxlines error")
 	}
+	if err := tr.SetBanTimeMultiplier(10 * time.Second); err != nil {
+		t.Fatal(err)
+	}
+	if got := tr.Options().BanTimeMultiplier; got != 10*time.Second {
+		t.Fatalf("multiplier = %s, want 10s", got)
+	}
+	if err := tr.SetBanTimeMultiplier(-time.Second); err == nil {
+		t.Fatal("expected invalid multiplier error")
+	}
+}
+
+func TestLinearBanTimeMultiplier(t *testing.T) {
+	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
+	tr := newTestTracker(t, &now, Options{
+		MaxRetry:          1,
+		BanTime:           60 * time.Second,
+		BanTimeMultiplier: 10 * time.Second,
+	})
+	for i := 1; i <= 7; i++ {
+		r := tr.AddFailure("203.0.113.5", now, "x")
+		if r.Ban == nil {
+			t.Fatalf("ban %d missing", i)
+		}
+		want := time.Duration(i*10) * time.Second
+		if want < 60*time.Second {
+			want = 60 * time.Second
+		}
+		if r.Ban.Duration != want {
+			t.Fatalf("ban %d duration = %s, want %s", i, r.Ban.Duration, want)
+		}
+		if r.Ban.BanCount != i {
+			t.Fatalf("ban %d count = %d", i, r.Ban.BanCount)
+		}
+		if _, err := tr.Unban("203.0.113.5"); err != nil {
+			t.Fatal(err)
+		}
+		now = now.Add(time.Minute)
+	}
+}
+
+func TestLinearBanTimeMultiplierMax(t *testing.T) {
+	now := time.Date(2026, 11, 22, 12, 0, 0, 0, time.UTC)
+	tr := newTestTracker(t, &now, Options{
+		MaxRetry:          1,
+		BanTime:           60 * time.Second,
+		BanTimeMultiplier: 10 * time.Second,
+		BanTimeMax:        75 * time.Second,
+	})
+	for i := 1; i <= 8; i++ {
+		r := tr.AddFailure("203.0.113.6", now, "x")
+		if r.Ban == nil {
+			t.Fatalf("ban %d missing", i)
+		}
+		want := time.Duration(i*10) * time.Second
+		if want < 60*time.Second {
+			want = 60 * time.Second
+		}
+		if want > 75*time.Second {
+			want = 75 * time.Second
+		}
+		if r.Ban.Duration != want {
+			t.Fatalf("ban %d duration = %s, want %s", i, r.Ban.Duration, want)
+		}
+		if _, err := tr.Unban("203.0.113.6"); err != nil {
+			t.Fatal(err)
+		}
+		now = now.Add(time.Minute)
+	}
 }
 
 func TestFindTimeWindowAndStale(t *testing.T) {
