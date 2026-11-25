@@ -272,7 +272,7 @@ func TestMoreRealLogFilters(t *testing.T) {
 		{"haproxy", "haproxy-http-auth", "web/haproxy-http-auth.log", 4, 3, map[string]int{"203.0.113.76": 1, "2001:db8::76": 1, "::ffff:192.0.2.76": 1}},
 		{"traefik", "traefik-auth", "web/traefik-auth.log", 4, 2, map[string]int{"10.0.0.3": 1, "2001:db8::77": 1}},
 		{"nextcloud", "nextcloud-auth", "webapps/nextcloud.log", 3, 2, map[string]int{"203.0.113.203": 1, "203.0.113.204": 1}},
-		{"wordpress", "wordpress", "webapps/wordpress.log", 6, 3, map[string]int{"203.0.113.210": 1, "203.0.113.212": 1, "2001:db8::213": 1}},
+		{"wordpress", "wordpress", "webapps/wordpress.log", 7, 3, map[string]int{"203.0.113.210": 1, "203.0.113.212": 1, "2001:db8::213": 1}},
 		{"roundcube", "roundcube-auth", "webapps/roundcube.log", 4, 3, map[string]int{"203.0.113.201": 1, "203.0.113.202": 1, "203.0.113.203": 1}},
 		{"phpmyadmin", "phpmyadmin-syslog", "webapps/phpmyadmin.log", 3, 2, map[string]int{"203.0.113.202": 1, "203.0.113.203": 1}},
 		{"webmin", "webmin-auth", "webapps/webmin.log", 3, 2, map[string]int{"203.0.113.200": 1, "203.0.113.201": 1}},

@@ -32,9 +32,9 @@ func writeConfig(t *testing.T, dir string, bantime string) (authLog, actionLog s
 		t.Fatal(err)
 	}
 	writeFile(t, filepath.Join(dir, "autoban.conf"), `[Definition]
-socket = `+filepath.Join(dir, "f2b.sock")+`
-pidfile = `+filepath.Join(dir, "f2b.pid")+`
-dbfile = `+filepath.Join(dir, "f2b.db")+`
+socket = `+filepath.Join(dir, "autoban.sock")+`
+pidfile = `+filepath.Join(dir, "autoban.pid")+`
+dbfile = `+filepath.Join(dir, "autoban.db")+`
 dbpurgeage = 1d
 pollinterval = 100ms
 loglevel = DEBUG

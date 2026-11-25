@@ -34,7 +34,7 @@
 | Filter | 软件 | 典型日志 |
 |---|---|---|
 | `nextcloud-auth` | Nextcloud | JSON 日志中的 `Login failed` |
-| `wordpress` | WordPress | Caddy JSON access log 中 `POST /wp-login.php` 或 `POST /xmlrpc.php` 的失败请求 |
+| `wordpress` | WordPress | Caddy JSON access log 中 `POST /wp-login.php` 失败请求，或 `POST /xmlrpc.php` 的 401/403/429 |
 | `roundcube-auth` | Roundcube | `FAILED login` / `IMAP Error: Login failed` |
 | `phpmyadmin-syslog` | phpMyAdmin | syslog 中的 `user denied` |
 | `webmin-auth` | Webmin | `Invalid login` / `Non-existent login` |
@@ -166,7 +166,7 @@
 以下软件核心默认没有稳定、包含来源 IP 的失败日志，通常需要插件/访问日志/ACL 方案：
 
 - Drupal / Joomla：依赖安全插件、Web 服务器 401/403 access log 或数据库 watchdog。
-- WordPress：本项目提供 `wordpress` filter，读取 Caddy JSON access log 中的 `wp-login.php` / `xmlrpc.php` 请求；其他 Web 服务器需按实际日志格式调整。
+- WordPress：本项目提供 `wordpress` filter，读取 Caddy JSON access log 中的 `wp-login.php` 失败请求，以及 `xmlrpc.php` 的 401/403/429；XML-RPC 的 200 响应可能来自 Jetpack/WordPress.com，故意不匹配。
 - FreeRADIUS、strongSwan、Kamailio：日志字段和连接/IP 关联方式差异较大，建议按实际版本自定义。
 
 ## Filter 参数与 mode

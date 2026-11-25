@@ -70,7 +70,7 @@ systemctl is-active autoban
 systemctl is-enabled autoban
 sudo autoban-ctl -config /etc/autoban status
 sudo autoban-ctl -config /etc/autoban status sshd
-sudo nft list table inet "f2b-sshd"
+sudo nft list table inet "autoban-sshd"
 ```
 
 ### 2.3 安装路径
@@ -102,7 +102,7 @@ banaction = nftables
 nftables 动作为每个 jail 创建独立表：
 
 ```text
-table inet f2b-sshd
+table inet autoban-sshd
   set banned4 { type ipv4_addr }
   set banned6 { type ipv6_addr }
 ```
@@ -208,7 +208,7 @@ banaction = nftables
 ```bash
 rc-service autoban status
 sudo autoban-ctl -config /etc/autoban status sshd
-sudo nft list table inet "f2b-sshd"
+sudo nft list table inet "autoban-sshd"
 ```
 
 Alpine 包当前通过 OpenRC 以 root 启动，因为 nftables 需要特权，且 `/var/log/messages` 的权限在不同 Alpine 镜像中可能不同。包会创建 `autoban` 用户/组，但 init 脚本没有切换用户。若需要更严格的权限模型，可以自行改为 `command_user` 并配置 `CAP_NET_ADMIN`、日志读取权限和目录属主。
@@ -244,7 +244,7 @@ sudo apk del autoban
 `autoban.pre-deinstall` 会停止并移除 OpenRC 服务。卸载后如需确认规则已清理：
 
 ```bash
-sudo nft list tables | grep f2b || true
+sudo nft list tables | grep autoban || true
 ```
 
 ## 5. 注意事项
@@ -252,8 +252,8 @@ sudo nft list tables | grep f2b || true
 1. 两个包都要求 `nftables`。autoban 的默认动作不会回退到 iptables。
 2. 两个包都显式冲突 `fail2ban`。不要在同一台机器上同时运行两个守护进程，否则它们可能重复封禁或互相清理规则。
 3. 默认只启用 `sshd` jail。切换动作前，建议先用 `dummy` 验证过滤器。
-4. 封禁表按 jail 命名，例如 `f2b-sshd`。检查时必须引用表名：
+4. 封禁表按 jail 命名，例如 `autoban-sshd`。检查时必须引用表名：
    ```bash
-   nft list table inet "f2b-sshd"
+   nft list table inet "autoban-sshd"
    ```
 5. 生产环境建议使用稳定的 APK 签名密钥，而不是每次构建都生成临时密钥。当前脚本生成的临时公钥适合本地安装和测试。

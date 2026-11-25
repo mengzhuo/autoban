@@ -228,8 +228,8 @@ datepattern = {^LN-BEG}%Y-%m-%dT%H:%M:%S
 
 ```ini
 [Definition]
-actionstart = <iptables> -N f2b-<name>
-actionban = <iptables> -I f2b-<name> 1 -s <ip> -j <blocktype>
+actionstart = <iptables> -N autoban-<name>
+actionban = <iptables> -I autoban-<name> 1 -s <ip> -j <blocktype>
 
 [Init]
 name = default
@@ -280,15 +280,15 @@ iptables：
 
 ```ini
 [Definition]
-actionstart = <iptables> -N f2b-<name>
-              <iptables> -A f2b-<name> -j RETURN
-              <iptables> -I <chain> -p <protocol> -m multiport --dports <port> -j f2b-<name>
-actionstop = <iptables> -D <chain> -p <protocol> -m multiport --dports <port> -j f2b-<name>
-             <iptables> -F f2b-<name>
-             <iptables> -X f2b-<name>
+actionstart = <iptables> -N autoban-<name>
+              <iptables> -A autoban-<name> -j RETURN
+              <iptables> -I <chain> -p <protocol> -m multiport --dports <port> -j autoban-<name>
+actionstop = <iptables> -D <chain> -p <protocol> -m multiport --dports <port> -j autoban-<name>
+             <iptables> -F autoban-<name>
+             <iptables> -X autoban-<name>
 actioncheck = <iptables> -n -L <chain> >/dev/null 2>&1
-actionban = <iptables> -I f2b-<name> 1 -s <ip> -j <blocktype>
-actionunban = <iptables> -D f2b-<name> -s <ip> -j <blocktype>
+actionban = <iptables> -I autoban-<name> 1 -s <ip> -j <blocktype>
+actionunban = <iptables> -D autoban-<name> -s <ip> -j <blocktype>
 
 [Init]
 name = default
